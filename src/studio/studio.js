@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { Models } from "../models/Models.js";
+import { GoodieShapes } from "../models/Geometry.js";
 import { Terrain } from "../world/Terrain.js";
 
 const $ = (id) => document.getElementById(id);
@@ -49,7 +50,8 @@ const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 const objects = [];
 const modelTypes = ["tree", "house", "rock", "crystal", "mushroom", "flower", "bush", "barrel", "lamp", "fence"];
-const icons = { tree:"🌳", house:"🏠", rock:"🪨", crystal:"💎", mushroom:"🍄", flower:"🌼", bush:"🌿", barrel:"🛢️", lamp:"💡", fence:"🪵" };
+const shapeTypes = ["box", "sphere", "ellipsoid", "plane", "circle", "ring", "cylinder", "cone", "capsule", "torus", "torusKnot", "pyramid", "dodecahedron", "icosahedron", "octahedron", "tetrahedron"];
+const icons = { tree:"🌳", house:"🏠", rock:"🪨", crystal:"💎", mushroom:"🍄", flower:"🌼", bush:"🌿", barrel:"🛢️", lamp:"💡", fence:"🪵", box:"🧊", sphere:"⚪", ellipsoid:"🥚", plane:"▱", circle:"🔵", ring:"⭕", cylinder:"🥫", cone:"🔺", capsule:"💊", torus:"🍩", torusKnot:"🪢", pyramid:"🔻", dodecahedron:"💠", icosahedron:"🔷", octahedron:"🔶", tetrahedron:"🔺" };
 let selected = null;
 let terrain = null;
 let terrainSettings = { biome: "meadow", seed: 7, amplitude: 4 };
@@ -66,6 +68,20 @@ function makeModel(type) {
   object.name = type[0].toUpperCase() + type.slice(1) + " " + object.userData.editorId;
   object.position.set(0, 0, 0);
   object.traverse((node) => { if (node.isMesh) { node.castShadow = true; node.receiveShadow = true; } });
+  scene.add(object);
+  objects.push(object);
+  selectObject(object);
+  refresh();
+  return object;
+}
+
+function makeShape(type) {
+  const factory = GoodieShapes[type];
+  if (typeof factory !== "function") throw new Error("Unknown geometry shape: " + type);
+  const object = factory({ color: "#e9a85b" });
+  object.userData.goodieType = "shape:" + type;
+  object.userData.editorId = nextId++;
+  object.name = type[0].toUpperCase() + type.slice(1) + " " + object.userData.editorId;
   scene.add(object);
   objects.push(object);
   selectObject(object);
@@ -174,6 +190,16 @@ function addModel(type) {
   markChanged();
   renderInspector();
 }
+
+$("shapeGrid").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-shape]");
+  if (button) {
+    const object = makeShape(button.dataset.shape);
+    object.position.set(0, terrain ? terrain.getHeightAt(0, 0) + 0.6 : 0.6, 0);
+    markChanged();
+    renderInspector();
+  }
+});
 
 $("assetGrid").addEventListener("click", (event) => {
   const button = event.target.closest("[data-model]");
