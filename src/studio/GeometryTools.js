@@ -53,6 +53,7 @@ export function editGeometry(root, operation, axis = "x") {
       geometry.computeBoundingBox();
       const center = geometry.boundingBox.getCenter(new Vector3());
       geometry.translate(-center.x, -center.y, -center.z);
+      center.multiply(mesh.scale).applyQuaternion(mesh.quaternion);
       mesh.position.add(center);
     } else if (operation === "normals") {
       geometry.computeVertexNormals();
