@@ -1,11 +1,11 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
-import { BufferGeometryLoader } from "three/addons/loaders/BufferGeometryLoader.js";
+
 import { Models } from "../models/Models.js";
 import { GoodieShapes } from "../models/Geometry.js";
 import { Terrain } from "../world/Terrain.js";
-import { editGeometry, inspectGeometry } from "./GeometryTools.js";
+import { editGeometry, inspectGeometry, restoreGeometryJSON } from "./GeometryTools.js";
 
 const $ = (id) => document.getElementById(id);
 document.documentElement.classList.toggle("desktop-app", Boolean(window.goodieDesktop?.isDesktop));
@@ -599,7 +599,6 @@ async function importSceneText(text) {
       applyMaterialSettings({ color: /^#[0-9a-f]{6}$/i.test(material.color) ? material.color : "#ffffff", roughness: Number.isFinite(Number(material.roughness)) ? THREE.MathUtils.clamp(Number(material.roughness),0,1) : 0.7, metalness: Number.isFinite(Number(material.metalness)) ? THREE.MathUtils.clamp(Number(material.metalness),0,1) : 0, opacity: Number.isFinite(Number(material.opacity)) ? THREE.MathUtils.clamp(Number(material.opacity),0,1) : 1, wireframe: Boolean(material.wireframe) }, object, false);
     }
     if (Array.isArray(item.geometryOverrides) && !object.userData.goodieGroup) {
-      const loader = new BufferGeometryLoader();
       for (const override of item.geometryOverrides) {
         if (!Array.isArray(override?.path) || !override.geometry) continue;
         let target = object;
@@ -610,7 +609,7 @@ async function importSceneText(text) {
         }
         if (!validPath || !target.isMesh) continue;
         try {
-          const geometry = loader.parse(override.geometry);
+          const geometry = restoreGeometryJSON(override.geometry);
           target.geometry.dispose();
           target.geometry = geometry;
           target.userData.goodieGeometryEdited = true;
