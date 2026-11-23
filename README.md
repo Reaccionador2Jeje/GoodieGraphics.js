@@ -128,6 +128,7 @@ Dispose effects when removing them permanently to release GPU resources.
 - `Terrain`: seeded procedural terrain and biome palettes.
 - `DayNightCycle`: dynamic sun, ambient light, sky and fog.
 - `Models`: procedural 3D asset library.
+- `Animator`, `AnimationBuilder`, `AnimationPresets`: GoodieAnimations keyframes, playback and motion presets.
 - `Materials`: reusable material presets.
 - `ParticleEmitter`, `Water`, `Glow`: GoodieFX real-time effects.
 
