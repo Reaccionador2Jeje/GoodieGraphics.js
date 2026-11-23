@@ -1,28 +1,106 @@
 {
-  "name":"goodiegraphics.js","version":"1.0.0",
-  "description":"A creative 3D toolkit for web and desktop, powered by Three.js.",
-  "type":"module","license":"BSD-3-Clause",
-  "keywords":["3d","threejs","graphics","webgl","3d-editor","world-builder","animation","gltf","obj","fbx","electron","desktop"],
-  "main":"./src/index.js","module":"./src/index.js",
-  "exports":{".":{"types":"./index.d.ts","import":"./src/index.js"},"./*":"./src/*"},
-  "files":["src","electron","examples","README.md","LICENSE","index.d.ts","CHANGELOG.md","index.html","studio.html","vite.config.js"],
-  "scripts":{
-    "dev":"vite","build":"vite build","preview":"vite preview","test":"node --test",
-    "check":"node --check src/index.js && node --check src/studio/studio.js && node --check electron/main.js && node --check electron/preload.cjs",
-    "desktop:dev":"concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173/studio.html && cross-env GOODIE_DEV_SERVER=http://127.0.0.1:5173 electron .\"",
-    "desktop:build":"npm run build && electron-builder",
-    "desktop:win":"npm run build && electron-builder --win",
-    "desktop:linux":"npm run build && electron-builder --linux",
-    "desktop:mac":"npm run build && electron-builder --mac"
+  "name": "goodiegraphics.js",
+  "version": "1.0.0",
+  "description": "A creative 3D toolkit for web and desktop, powered by Three.js.",
+  "type": "module",
+  "license": "BSD-3-Clause",
+  "keywords": [
+    "3d",
+    "threejs",
+    "graphics",
+    "webgl",
+    "3d-editor",
+    "world-builder",
+    "animation",
+    "gltf",
+    "obj",
+    "fbx",
+    "electron",
+    "desktop"
+  ],
+  "main": "./src/index.js",
+  "module": "./src/index.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./src/index.js"
+    },
+    "./*": "./src/*"
   },
-  "dependencies":{"three":"^0.180.0"},
-  "devDependencies":{"concurrently":"^9.2.1","cross-env":"^7.0.3","electron":"^39.2.7","electron-builder":"^26.0.12","vite":"^7.1.0","wait-on":"^8.0.4"},
-  "build":{"appId":"dev.atdev.goodiestudio","productName":"GoodieStudio","asar":true,"directories":{"output":"release"},
-    "files":["dist/**/*","electron/**/*","package.json"],
-    "mac":{"category":"public.app-category.graphics-design","target":["dmg"]},
-    "win":{"target":["nsis"]},
-    "nsis":{"oneClick":false,"allowToChangeInstallationDirectory":true,"createDesktopShortcut":true},
-    "linux":{"category":"Graphics","target":["AppImage","deb"]}
+  "files": [
+    "src",
+    "electron",
+    "examples",
+    "README.md",
+    "LICENSE",
+    "index.d.ts",
+    "CHANGELOG.md",
+    "index.html",
+    "studio.html",
+    "vite.config.js"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test",
+    "check": "node --check src/index.js && node --check src/studio/studio.js && node --check electron/main.js && node --check electron/preload.cjs",
+    "desktop:dev": "concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173/studio.html && cross-env GOODIE_DEV_SERVER=http://127.0.0.1:5173 electron electron/main.js\"",
+    "desktop:build": "npm run build && electron-builder",
+    "desktop:win": "npm run build && electron-builder --win",
+    "desktop:linux": "npm run build && electron-builder --linux",
+    "desktop:mac": "npm run build && electron-builder --mac"
   },
-  "types":"./index.d.ts","sideEffects":false
+  "dependencies": {
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "cross-env": "^7.0.3",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12",
+    "vite": "^7.1.0",
+    "wait-on": "^8.0.4"
+  },
+  "build": {
+    "appId": "dev.atdev.goodiestudio",
+    "productName": "GoodieStudio",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.graphics-design",
+      "target": [
+        "dmg"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
+    "linux": {
+      "category": "Graphics",
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "extraMetadata": {
+      "main": "electron/main.js"
+    }
+  },
+  "types": "./index.d.ts",
+  "sideEffects": false
 }
