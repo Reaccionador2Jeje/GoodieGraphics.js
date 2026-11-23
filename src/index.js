@@ -8,4 +8,4 @@ export { Glow } from "./effects/Glow.js";
 export { Terrain } from "./world/Terrain.js";
 export { DayNightCycle } from "./world/DayNightCycle.js";
 
-export const version = "0.3.0";
+export const version = "0.4.0";
