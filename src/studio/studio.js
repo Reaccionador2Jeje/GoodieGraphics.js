@@ -152,7 +152,7 @@ function field(axis, value, kind) {
   input.step = kind === "scale" ? "0.1" : "0.25";
   input.value = Number(value.toFixed(2));
   input.addEventListener("change", () => {
-    if (!selected) return;
+    if (!selected || selected.userData.locked) return;
     const number = Number(input.value);
     if (!Number.isFinite(number)) return;
     if (kind === "position") selected.position[axis] = number;
