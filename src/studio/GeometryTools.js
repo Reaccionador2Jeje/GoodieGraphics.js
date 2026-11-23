@@ -75,12 +75,17 @@ const typedArrays = {
   Int32Array, Uint32Array, Float32Array, Float64Array
 };
 
-function restoreAttribute(data) {
-  const ArrayType = typedArrays[data?.type];
-  if (!ArrayType || !Array.isArray(data.array) || !Number.isInteger(data.itemSize) || data.itemSize < 1 || data.itemSize > 4) {
-    throw new TypeError("Invalid serialized geometry attribute.");
+function restoreAttribute(data, fallbackType = "Float32Array") {
+  const source = Array.isArray(data) ? { array: data } : data;
+  const rawArray = Array.isArray(source?.array)
+    ? source.array
+    : (ArrayBuffer.isView(source?.array) ? Array.from(source.array) : null);
+  const ArrayType = typedArrays[source?.type] || typedArrays[fallbackType];
+  const itemSize = source?.itemSize ?? (fallbackType === "Uint32Array" ? 1 : undefined);
+  if (!ArrayType || !rawArray || !Number.isInteger(itemSize) || itemSize < 1 || itemSize > 4) {
+    throw new TypeError("Invalid serialized geometry attribute (type=" + String(source?.type) + ", itemSize=" + String(itemSize) + ").");
   }
-  return new BufferAttribute(new ArrayType(data.array), data.itemSize, Boolean(data.normalized));
+  return new BufferAttribute(new ArrayType(rawArray), itemSize, Boolean(source.normalized));
 }
 
 export function serializeGeometryJSON(source) {
@@ -96,7 +101,7 @@ export function restoreGeometryJSON(json) {
   if (!data || typeof data.attributes !== "object") throw new TypeError("Invalid serialized BufferGeometry.");
   const geometry = new BufferGeometry();
   for (const [name, attribute] of Object.entries(data.attributes)) geometry.setAttribute(name, restoreAttribute(attribute));
-  if (data.index) geometry.setIndex(restoreAttribute(data.index));
+  if (data.index) geometry.setIndex(restoreAttribute(data.index, "Uint32Array"));
   for (const group of data.groups || []) geometry.addGroup(group.start, group.count, group.materialIndex);
   if (data.drawRange) geometry.setDrawRange(data.drawRange.start ?? 0, data.drawRange.count ?? Infinity);
   for (const [name, attributes] of Object.entries(data.morphAttributes || {})) {
