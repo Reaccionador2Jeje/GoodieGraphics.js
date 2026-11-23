@@ -5,6 +5,7 @@ import { GoodieShapes } from "../models/Geometry.js";
 import { Terrain } from "../world/Terrain.js";
 
 const $ = (id) => document.getElementById(id);
+document.documentElement.classList.toggle("desktop-app", Boolean(window.goodieDesktop?.isDesktop));
 const host = $("canvasHost");
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#a9c9d9");
