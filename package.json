@@ -31,10 +31,14 @@
   },
   "files": [
     "src",
+    "examples",
     "README.md",
     "LICENSE",
     "index.d.ts",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "index.html",
+    "studio.html",
+    "vite.config.js"
   ],
   "scripts": {
     "dev": "vite",
