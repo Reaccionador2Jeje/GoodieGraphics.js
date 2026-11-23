@@ -245,12 +245,10 @@ Then visit `http://localhost:5173/studio.html`. GoodieStudio is a browser-based 
 - Combine primitive shapes to start building custom models.
 - Select objects from the viewport or scene hierarchy.
 - Edit position, rotation and scale in the inspector or with interactive 3D transform gizmos in the viewport.
+- Edit mesh base color, roughness, metalness, opacity and wireframe from the material inspector.
 - Switch between move, rotate and scale modes with toolbar buttons or W/E/R keyboard shortcuts.
 - Duplicate and delete objects.
 - Generate seeded terrain across all five GoodieWorld biomes.
 - Export a scene to a `.goodie.json` file and import it later.
 
-The scene format stores asset type, transforms, scene name and terrain settings. Imported files are validated before their contents are added. GoodieStudio currently focuses on scene assembly and transforms; advanced mesh sculpting is future work.
-
-
-GoodieStudio's inspector also supports per-object material editing (base color, roughness, metalness, opacity and wireframe), with settings saved in scene exports.
+The scene format stores asset type, transforms, material overrides, scene name and terrain settings. Material settings are restored when a `.goodie.json` file is imported. Imported files are validated before their contents are added. GoodieStudio focuses on scene assembly and object/material editing; advanced mesh sculpting is future work.
