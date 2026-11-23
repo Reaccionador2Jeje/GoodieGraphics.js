@@ -35,7 +35,7 @@ function trackPath(root, target, property) {
   if (typeof property !== "string" || !property.trim() || property.includes(".")) {
     throw new TypeError("Use a single Three.js property name such as position, rotation or scale.");
   }
-  return target === root ? "." + property : target.name + "." + property;
+  return target === root ? "." + property : target.uuid + "." + property;
 }
 
 /**
