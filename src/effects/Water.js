@@ -11,6 +11,10 @@ export class Water {
     waveScale = 0.16,
     segments = 48
   } = {}) {
+    if (![width, height].every((value) => Number.isFinite(value) && value > 0)) throw new RangeError("Water width and height must be positive finite numbers.");
+    if (!Number.isFinite(opacity) || opacity < 0 || opacity > 1) throw new RangeError("Water opacity must be between 0 and 1.");
+    if (!Number.isFinite(waveSpeed) || !Number.isFinite(waveScale)) throw new TypeError("Water wave settings must be finite numbers.");
+    if (!Number.isFinite(segments) || segments < 1 || segments > 256) throw new RangeError("Water segments must be between 1 and 256.");
     this.time = 0;
     this.waveSpeed = waveSpeed;
     this.mesh = new THREE.Mesh(
