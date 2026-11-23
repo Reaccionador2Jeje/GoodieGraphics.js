@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Added
+- Ctrl/Cmd multi-selection in the hierarchy and viewport, plus grouping of selected sibling objects into nested groups. Group transforms preserve child world transforms and the recursive scene format retains the hierarchy.
 - Geometry inspector tools for centering pivots, recalculating normals and mirroring mesh geometry on any axis.
 - Geometry statistics and non-destructive buffer cloning, with edited geometry and local mesh transforms persisted in `.goodie.json` scenes.
 - Nested scene groups with Group all and Ungroup actions, plus recursive scene serialization and restoration.
