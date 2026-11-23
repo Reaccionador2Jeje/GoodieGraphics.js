@@ -14,4 +14,4 @@ export { Animator, LoopOnce, LoopRepeat, LoopPingPong } from "./animations/Anima
 export { AnimationBuilder } from "./animations/AnimationBuilder.js";
 export { AnimationPresets } from "./animations/AnimationPresets.js";
 
-export const version = "0.4.0";
+export const version = "1.0.0";
