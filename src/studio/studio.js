@@ -186,9 +186,10 @@ function renderInspector() {
 
 function refresh() { renderHierarchy(); renderInspector(); }
 function markChanged() {
+  const wasClean = !hasUnsavedChanges;
   hasUnsavedChanges = true;
   $("saveState").textContent = "● Unsaved changes";
-  window.goodieDesktop?.setDirty(true);
+  if (wasClean) window.goodieDesktop?.setDirty(true);
 }
 function markClean(label = "● Ready") {
   hasUnsavedChanges = false;
@@ -239,6 +240,7 @@ $("applyTerrain").addEventListener("click", rebuildTerrain);
 
 function removeSelected() {
   if (!selected) return;
+  transformControls.detach();
   scene.remove(selected);
   const index = objects.indexOf(selected);
   if (index >= 0) objects.splice(index, 1);
