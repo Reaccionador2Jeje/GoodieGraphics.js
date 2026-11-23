@@ -13,6 +13,11 @@ test("exports the public API", () => {
   assert.equal(typeof Animator, "function");
   assert.equal(typeof AnimationBuilder, "function");
   assert.equal(typeof AnimationPresets, "function");
+  assert.equal(typeof GoodieShapes.box, "function");
+  assert.equal(Shapes, GoodieShapes);
+  assert.equal(GoodieShapes.wireframe({ geometry: GoodieShapes.box().geometry }).isLineSegments, true);
+  assert.equal(typeof ModelBuilder, "function");
+  assert.equal(typeof ModelLoader.load, "function");
 });
 
 test("every procedural model returns a named Three.js Group", () => {
