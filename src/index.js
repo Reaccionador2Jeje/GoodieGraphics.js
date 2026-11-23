@@ -1,6 +1,9 @@
 export { Game } from "./core/Game.js";
 export { World } from "./core/World.js";
 export { Models } from "./models/Models.js";
+export { GoodieShapes, Shapes } from "./models/Geometry.js";
+export { ModelBuilder } from "./models/ModelBuilder.js";
+export { ModelLoader } from "./models/ModelLoader.js";
 export { Materials } from "./materials/Materials.js";
 export { ParticleEmitter } from "./effects/ParticleEmitter.js";
 export { Water } from "./effects/Water.js";
