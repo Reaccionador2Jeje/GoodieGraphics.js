@@ -106,7 +106,7 @@ function renderHierarchy() {
   }
   list.innerHTML = "";
   [...objects].reverse().forEach((object) => {
-    const type = object.userData.goodieType;
+    const type = object.userData.goodieType.replace(/^shape:/, "");
     const button = document.createElement("button");
     button.className = "object-row" + (object === selected ? " selected" : "");
     button.innerHTML = '<span>' + (icons[type] || "📦") + '</span><span></span><small>3D</small>';
@@ -147,7 +147,7 @@ function renderInspector() {
   }
   const title = document.createElement("p");
   title.className = "inspector-name";
-  title.textContent = (icons[selected.userData.goodieType] || "📦") + "  " + selected.name;
+  title.textContent = (icons[selected.userData.goodieType.replace(/^shape:/, "")] || "📦") + "  " + selected.name;
   panel.appendChild(title);
   for (const [kind, label, values] of [
     ["position", "POSITION", selected.position],
@@ -227,15 +227,22 @@ function removeSelected() {
 $("deleteObject").addEventListener("click", removeSelected);
 $("duplicateObject").addEventListener("click", () => {
   if (!selected) return;
-  const source = selected;
-  const copy = makeModel(source.userData.goodieType);
-  copy.position.copy(source.position).add(new THREE.Vector3(1.5, 0, 1.5));
-  copy.rotation.copy(source.rotation);
-  copy.scale.copy(source.scale);
+  const copy = selected.clone(true);
+  copy.traverse((node) => {
+    if (!node.isMesh) return;
+    node.geometry = node.geometry.clone();
+    node.material = Array.isArray(node.material)
+      ? node.material.map((item) => item.clone())
+      : node.material.clone();
+  });
+  copy.userData.editorId = nextId++;
+  copy.name = selected.name.replace(/ \d+$/, "") + " " + copy.userData.editorId;
+  copy.position.add(new THREE.Vector3(1.5, 0, 1.5));
+  scene.add(copy);
+  objects.push(copy);
+  selectObject(copy);
   markChanged();
-  renderInspector();
 });
-
 function focusSelection() {
   if (!selected) return;
   const box = new THREE.Box3().setFromObject(selected);
