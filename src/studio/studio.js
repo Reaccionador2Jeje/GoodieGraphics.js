@@ -71,6 +71,7 @@ const modelTypes = ["tree", "house", "rock", "crystal", "mushroom", "flower", "b
 const shapeTypes = ["box", "sphere", "ellipsoid", "plane", "circle", "ring", "cylinder", "cone", "capsule", "torus", "torusKnot", "pyramid", "dodecahedron", "icosahedron", "octahedron", "tetrahedron"];
 const icons = { group:"🗂️", tree:"🌳", house:"🏠", rock:"🪨", crystal:"💎", mushroom:"🍄", flower:"🌼", bush:"🌿", barrel:"🛢️", lamp:"💡", fence:"🪵", box:"🧊", sphere:"⚪", ellipsoid:"🥚", plane:"▱", circle:"🔵", ring:"⭕", cylinder:"🥫", cone:"🔺", capsule:"💊", torus:"🍩", torusKnot:"🪢", pyramid:"🔻", dodecahedron:"💠", icosahedron:"🔷", octahedron:"🔶", tetrahedron:"🔺" };
 let selected = null;
+const selectedObjects = new Set();
 let terrain = null;
 let terrainSettings = { biome: "meadow", seed: 7, amplitude: 4 };
 let nextId = 1;
@@ -110,11 +111,20 @@ function makeShape(type) {
   return object;
 }
 
-function selectObject(object) {
-  selected = object;
-  if (selected && !selected.userData.locked) transformControls.attach(selected);
+function selectObject(object, additive = false) {
+  if (additive && object) {
+    if (selectedObjects.has(object)) selectedObjects.delete(object);
+    else selectedObjects.add(object);
+    selected = object;
+    if (selectedObjects.size === 0) selectedObjects.add(object);
+  } else {
+    selectedObjects.clear();
+    if (object) selectedObjects.add(object);
+    selected = object;
+  }
+  if (selected && selectedObjects.size === 1 && !selected.userData.locked) transformControls.attach(selected);
   else transformControls.detach();
-  $("selectionToast").textContent = object ? object.name : "Nothing selected";
+  $("selectionToast").textContent = selectedObjects.size > 1 ? selectedObjects.size + " objects selected" : (object ? object.name : "Nothing selected");
   renderHierarchy();
   renderInspector();
 }
@@ -125,13 +135,13 @@ function renderHierarchy() {
   const list = $("objectList"); list.innerHTML = "";
   if (!objects.length) { list.innerHTML = '<div class="empty-state">Your scene is empty.<br/>Add an asset to begin.</div>'; return; }
   const appendNode = (object, depth = 0) => {
-    const row = document.createElement("div"); row.className = "hierarchy-row" + (object === selected ? " selected" : "");
+    const row = document.createElement("div"); row.className = "hierarchy-row" + (selectedObjects.has(object) ? " selected" : "");
     const choose = document.createElement("button"); choose.className = "object-row"; choose.type = "button";
     choose.innerHTML = '<span class="tree-icon"></span><span class="tree-name"></span><small></small>';
     choose.querySelector(".tree-icon").textContent = icons[object.userData.goodieType?.replace(/^shape:/, "")] || "📦";
     choose.querySelector(".tree-name").textContent = object.name;
     choose.querySelector("small").textContent = object.userData.locked ? "🔒" : (object.visible ? "3D" : "HIDDEN");
-    choose.style.paddingLeft = (8 + depth * 13) + "px"; choose.addEventListener("click", () => selectObject(object));
+    choose.style.paddingLeft = (8 + depth * 13) + "px"; choose.addEventListener("click", (event) => selectObject(object, event.ctrlKey || event.metaKey));
     const actions = document.createElement("div"); actions.className = "hierarchy-actions";
     const visibility = document.createElement("button"); visibility.type = "button"; visibility.title = object.visible ? "Hide object" : "Show object"; visibility.textContent = object.visible ? "◉" : "○";
     visibility.addEventListener("click", () => { object.visible = !object.visible; markChanged(); renderHierarchy(); if (object === selected) renderInspector(); });
@@ -327,10 +337,27 @@ function renderInspector() {
 
 function refresh() { renderHierarchy(); renderInspector(); }
 
+function groupSelectedObjects() {
+  const targets = [...selectedObjects].filter(object => object?.parent);
+  if (targets.length < 2) { alert("Select at least two objects. Use Ctrl-click (or Cmd-click) in the hierarchy."); return; }
+  const parent = targets[0].parent;
+  if (targets.some(object => object.parent !== parent)) { alert("Selected objects must share the same parent before grouping."); return; }
+  const group = new THREE.Group();
+  group.name = "Group " + nextId;
+  group.userData.goodieGroup = true; group.userData.goodieType = "group";
+  group.userData.editorId = nextId++; group.userData.locked = false;
+  parent.add(group);
+  for (const object of targets) group.attach(object);
+  if (parent === scene) {
+    for (const object of targets) { const index = objects.indexOf(object); if (index >= 0) objects.splice(index, 1); }
+    objects.push(group);
+  }
+  selectObject(group); markChanged();
+}
 function groupAllObjects() {
   if (objects.length < 2) { alert("Add at least two root objects before grouping."); return; }
-  const group = new THREE.Group(); group.name = "Group " + nextId; group.userData.goodieGroup = true; group.userData.goodieType = "group"; group.userData.editorId = nextId++; group.userData.locked = false;
-  scene.add(group); for (const object of [...objects]) group.attach(object); objects.splice(0, objects.length, group); selectObject(group); markChanged();
+  selectedObjects.clear(); objects.forEach(object => selectedObjects.add(object));
+  groupSelectedObjects();
 }
 function ungroupSelected() {
   if (!selected?.userData.goodieGroup) return;
@@ -338,7 +365,10 @@ function ungroupSelected() {
   const parent = group.parent || scene;
   const children = group.children.filter(child => child.userData?.goodieType || child.userData?.goodieGroup);
   for (const child of [...children]) { parent.attach(child); if (parent === scene) objects.push(child); }
-  parent.remove(group); selected = null; refresh(); markChanged();
+  parent.remove(group);
+  const rootIndex = objects.indexOf(group);
+  if (rootIndex >= 0) objects.splice(rootIndex, 1);
+  selected = null; selectedObjects.clear(); refresh(); markChanged();
 }
 function markChanged() {
   const wasClean = !hasUnsavedChanges;
@@ -397,6 +427,7 @@ function removeSelected() {
   if (!selected) return;
   transformControls.detach();
   const target = selected;
+  selectedObjects.delete(target);
   const parent = target.parent || scene;
   parent.remove(target);
   const index = objects.indexOf(target);
@@ -409,11 +440,13 @@ function removeSelected() {
     }
   });
   selected = null;
+  selectedObjects.clear();
   refresh();
   markChanged();
 }
 $("deleteObject").addEventListener("click", removeSelected);
 $("groupObjects").addEventListener("click", groupAllObjects);
+$("groupSelectedObjects").addEventListener("click", groupSelectedObjects);
 $("ungroupObject").addEventListener("click", ungroupSelected);
 $("duplicateObject").addEventListener("click", () => {
   if (!selected) return;
@@ -485,7 +518,7 @@ renderer.domElement.addEventListener("pointerup", (event) => {
     let target = hits[0].object;
     while (target.parent && !target.userData.goodieType) target = target.parent;
     if (target.userData.locked) return;
-    selectObject(target.userData.goodieType ? target : null);
+    selectObject(target.userData.goodieType ? target : null, event.ctrlKey || event.metaKey);
   } else selectObject(null);
 });
 
@@ -497,7 +530,7 @@ function serializeObject(object) {
   return data;
 }
 function serializeScene() {
-  return { format: "goodie-studio", version: 2, name: sceneName, terrain: terrainSettings, objects: objects.map(serializeObject) };
+  return { format: "goodie-studio", version: 3, name: sceneName, terrain: terrainSettings, objects: objects.map(serializeObject) };
 }
 
 async function exportScene() {
