@@ -2,7 +2,7 @@ import type * as THREE from "three";
 
 export type Vector3Tuple = [number, number, number];
 export type ColorValue = THREE.ColorRepresentation;
-export type GeometryMaterial = THREE.Material | THREE.MaterialParameters | ColorValue;
+export type GeometryMaterial = THREE.Material | Record<string, unknown> | ColorValue;
 export interface MeshOptions {
   name?: string;
   color?: ColorValue;
@@ -22,7 +22,7 @@ export interface GLTFAsset {
   [key: string]: unknown;
 }
 
-export declare const version: "1.0.0";
+export declare const version: string;
 
 export declare class Game {
   constructor(options?: {
