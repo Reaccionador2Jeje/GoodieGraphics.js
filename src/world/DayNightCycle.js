@@ -17,6 +17,7 @@ export class DayNightCycle {
     this._dayColor = new THREE.Color("#b9ddff");
     this._sunsetColor = new THREE.Color("#f2a06b");
     this._nightColor = new THREE.Color("#101a3d");
+    this._skyColor = new THREE.Color();
     this.update(0);
   }
 
@@ -34,9 +35,9 @@ export class DayNightCycle {
     sun.color.copy(this._dayColor).lerp(this._sunsetColor, sunset * 0.72);
     this.world.ambientLight.intensity = THREE.MathUtils.lerp(0.28, 1.55, daylight);
 
-    const sky = this._nightColor.clone().lerp(this._dayColor, daylight).lerp(this._sunsetColor, sunset * 0.35);
-    if (this.world.scene.background?.isColor) this.world.scene.background.copy(sky);
-    if (this.world.scene.fog?.color) this.world.scene.fog.color.copy(sky);
+    this._skyColor.copy(this._nightColor).lerp(this._dayColor, daylight).lerp(this._sunsetColor, sunset * 0.35);
+    if (this.world.scene.background?.isColor) this.world.scene.background.copy(this._skyColor);
+    if (this.world.scene.fog?.color) this.world.scene.fog.color.copy(this._skyColor);
 
     return this;
   }
