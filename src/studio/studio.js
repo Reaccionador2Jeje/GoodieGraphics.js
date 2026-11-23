@@ -59,6 +59,7 @@ let terrainSettings = { biome: "meadow", seed: 7, amplitude: 4 };
 let nextId = 1;
 let sceneName = "Untitled world";
 let pointerDown = null;
+let hasUnsavedChanges = false;
 
 function makeModel(type) {
   const factory = Models[type];
@@ -166,9 +167,18 @@ function renderInspector() {
 }
 
 function refresh() { renderHierarchy(); renderInspector(); }
-function markChanged() { $("saveState").textContent = "● Unsaved changes"; }
+function markChanged() {
+  hasUnsavedChanges = true;
+  $("saveState").textContent = "● Unsaved changes";
+  window.goodieDesktop?.setDirty(true);
+}
+function markClean(label = "● Ready") {
+  hasUnsavedChanges = false;
+  $("saveState").textContent = label;
+  window.goodieDesktop?.setDirty(false);
+}
 
-function rebuildTerrain() {
+function rebuildTerrain(markDirty = true) {
   if (terrain) {
     scene.remove(terrain.mesh);
     terrain.dispose();
@@ -181,9 +191,9 @@ function rebuildTerrain() {
   terrain = new Terrain({ width: 70, depth: 70, segments: 78, ...terrainSettings });
   terrain.mesh.position.y = -0.03;
   scene.add(terrain.mesh);
-  markChanged();
+  if (markDirty) markChanged();
 }
-rebuildTerrain();
+rebuildTerrain(false);
 
 function addModel(type) {
   const object = makeModel(type);
@@ -293,14 +303,14 @@ async function exportScene() {
   const suggestedName = (sceneName.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "goodie-world") + ".goodie.json";
   if (window.goodieDesktop?.isDesktop) {
     try {
-      if (await window.goodieDesktop.saveScene(data, suggestedName)) $("saveState").textContent = "● Exported";
+      if (await window.goodieDesktop.saveScene(data, suggestedName)) markClean("● Exported");
     } catch (error) { await window.goodieDesktop.showError(error.message); }
     return;
   }
   const url = URL.createObjectURL(new Blob([data], { type: "application/json" }));
   const link = document.createElement("a");
   link.href = url; link.download = suggestedName; link.click(); URL.revokeObjectURL(url);
-  $("saveState").textContent = "● Exported";
+  markClean("● Exported");
 }
 
 async function importSceneText(text) {
@@ -313,7 +323,7 @@ async function importSceneText(text) {
   $("seed").value = terrainData.seed ?? 7;
   $("terrainHeight").value = terrainData.amplitude ?? 4;
   $("heightValue").value = $("terrainHeight").value;
-  rebuildTerrain();
+  rebuildTerrain(false);
   for (const item of data.objects) {
     const isShape = typeof item.type === "string" && item.type.startsWith("shape:");
     const shapeType = isShape ? item.type.slice(6) : null;
@@ -324,7 +334,7 @@ async function importSceneText(text) {
     object.rotation.set(...(item.rotation || [0, 0, 0]));
     object.scale.fromArray(item.scale || [1, 1, 1]);
   }
-  $("saveState").textContent = "● Imported"; $("fileInput").value = ""; refresh();
+  $("fileInput").value = ""; refresh(); markClean("● Imported");
 }
 
 async function openScene() {
@@ -337,7 +347,7 @@ async function openScene() {
 }
 
 async function createNewScene() {
-  if (objects.length) {
+  if (hasUnsavedChanges) {
     const confirmed = window.goodieDesktop?.isDesktop
       ? await window.goodieDesktop.confirmNewScene()
       : confirm("Start a new scene? Your current scene will be cleared unless you exported it.");
@@ -346,7 +356,7 @@ async function createNewScene() {
   objects.slice().forEach((object) => { selected = object; removeSelected(); });
   sceneName = "Untitled world";
   $("biome").value = "meadow"; $("seed").value = 7; $("terrainHeight").value = 4; $("heightValue").value = 4;
-  rebuildTerrain(); $("saveState").textContent = "● Ready"; $("selectionToast").textContent = "Nothing selected";
+  rebuildTerrain(false); $("selectionToast").textContent = "Nothing selected"; markClean("● Ready");
 }
 
 $("exportScene").addEventListener("click", exportScene);
