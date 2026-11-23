@@ -6,14 +6,14 @@
     <meta name="theme-color" content="#10151d" />
     <meta name="description" content="Build colorful 3D worlds in GoodieStudio, the visual editor for GoodieGraphics.js." />
     <title>GoodieStudio — GoodieGraphics.js</title>
-    <link rel="stylesheet" href="/src/studio/studio.css" />
+    <link rel="stylesheet" href="./src/studio/studio.css" />
   </head>
   <body>
     <div class="studio-shell">
       <header class="topbar">
-        <a class="brand" href="/" aria-label="GoodieGraphics home"><span class="brand-mark">G</span><span>Goodie<span class="brand-light">Studio</span><small>GOODIEGRAPHICS.JS</small></span></a>
+        <div class="brand" aria-label="GoodieStudio"><span class="brand-mark">G</span><span>Goodie<span class="brand-light">Studio</span><small>GOODIEGRAPHICS.JS</small></span></div>
         <div class="top-actions">
-          <span class="save-state" id="saveState">● Ready</span>
+          <span class="save-state" id="saveState">● Ready</span><span class="desktop-indicator" id="desktopIndicator">DESKTOP</span>
           <button class="button ghost" id="newScene">New</button>
           <button class="button ghost" id="importScene">Import</button>
           <button class="button primary" id="exportScene">Export scene ↗</button>
@@ -86,6 +86,6 @@
       </main>
       <footer class="footer"><span>🍰 Make the Web 3D Delicious.</span><span>Built with Three.js · Designed for desktop and mobile</span></footer>
     </div>
-    <script type="module" src="/src/studio/studio.js"></script>
+    <script type="module" src="./src/studio/studio.js"></script>
   </body>
 </html>
