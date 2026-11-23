@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { Models, World, Materials, ParticleEmitter, Water, Terrain, DayNightCycle, Animator, AnimationBuilder, AnimationPresets, GoodieShapes, Shapes, ModelBuilder, ModelLoader, version, LoopOnce } from "../src/index.js";
 
 test("exports the public API", () => {
-  assert.equal(version, "0.4.0");
+  assert.equal(version, "1.0.0");
   assert.equal(typeof World, "function");
   assert.equal(typeof Materials.gold, "function");
   assert.equal(typeof ParticleEmitter, "function");
@@ -196,3 +196,4 @@ test("ModelBuilder assembles arbitrary meshes and nested groups", () => {
   assert.equal(ModelBuilder.from(model).build().children.length, model.children.length);
   assert.equal(typeof ModelLoader.gltf, "function");
 });
+\n\ntest("Terrain validates dimensions, density and query coordinates", () => {\n  assert.throws(() => new Terrain({ width: 0 }), /width and depth/);\n  assert.throws(() => new Terrain({ segments: 513 }), /between 2 and 512/);\n  const terrain = new Terrain({ segments: 4 });\n  assert.throws(() => terrain.getHeightAt(Number.NaN, 0), /finite numbers/);\n  terrain.dispose();\n});\n\ntest("ModelBuilder prevents cyclic scene graphs", () => {\n  const builder = new ModelBuilder();\n  const parent = builder.group("Parent");\n  const child = builder.group("Child", { parent });\n  assert.throws(() => builder.add(parent, { parent: child }), /cycle/);\n});\n
