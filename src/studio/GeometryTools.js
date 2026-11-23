@@ -80,7 +80,7 @@ function restoreAttribute(data, fallbackType = "Float32Array") {
   const rawArray = Array.isArray(source?.array)
     ? source.array
     : (ArrayBuffer.isView(source?.array) ? Array.from(source.array) : null);
-  const ArrayType = typedArrays[source?.type] || typedArrays[fallbackType];
+  const ArrayType = source?.type ? typedArrays[source.type] : typedArrays[fallbackType];
   const itemSize = source?.itemSize ?? (fallbackType === "Uint32Array" ? 1 : undefined);
   if (!ArrayType || !rawArray || !Number.isInteger(itemSize) || itemSize < 1 || itemSize > 4) {
     throw new TypeError("Invalid serialized geometry attribute (type=" + String(source?.type) + ", itemSize=" + String(itemSize) + ").");
