@@ -80,6 +80,51 @@ const terrain = new Terrain({ width: 110, depth: 110, segments: 84, seed: 23, bi
 terrain.mesh.position.y = -3.3;
 world.add(terrain.mesh);
 const dayNight = new DayNightCycle(world, { duration: 300, startAt: .34 });
+
+// Cuerpos celestes visibles: el sol acompaña a la luz principal y la luna
+// aparece en el lado opuesto con iluminación nocturna propia.
+const sunVisual = new THREE.Mesh(
+  new THREE.SphereGeometry(2.35, 24, 16),
+  new THREE.MeshBasicMaterial({ color: "#fff0b0", fog: false })
+);
+sunVisual.name = "BlockhavenSun";
+const sunGlow = new Glow({ color: "#ffd477", size: 15, opacity: .52, position: [0, 0, 0] });
+world.add(sunVisual, sunGlow.sprite);
+
+const moonVisual = new THREE.Mesh(
+  new THREE.SphereGeometry(1.75, 24, 16),
+  new THREE.MeshStandardMaterial({
+    color: "#dce8ff", emissive: "#9bb9ee", emissiveIntensity: .85,
+    roughness: .72, metalness: .04
+  })
+);
+moonVisual.name = "BlockhavenMoon";
+const moonLight = new THREE.DirectionalLight("#b9ccff", .32);
+moonLight.name = "BlockhavenMoonLight";
+moonLight.castShadow = false;
+world.add(moonVisual, moonLight);
+
+function updateCelestialBodies() {
+  const angle = dayNight.time * Math.PI * 2 - Math.PI / 2;
+  const sunDirection = new THREE.Vector3(Math.cos(angle), Math.sin(angle), .22).normalize();
+  const moonDirection = sunDirection.clone().negate();
+  const sunVisible = sunDirection.y > -.08;
+  const moonVisible = moonDirection.y > -.08;
+
+  sunVisual.position.copy(sunDirection).multiplyScalar(43);
+  sunGlow.sprite.position.copy(sunDirection).multiplyScalar(40);
+  sunVisual.visible = sunVisible;
+  sunGlow.sprite.visible = sunVisible;
+  world.sun.visible = sunDirection.y > -.18;
+
+  moonVisual.position.copy(moonDirection).multiplyScalar(40);
+  moonVisual.visible = moonVisible;
+  moonLight.position.copy(moonDirection).multiplyScalar(30);
+  moonLight.intensity = THREE.MathUtils.lerp(.025, .38, 1 - THREE.MathUtils.clamp((sunDirection.y + .12) * 2.5, 0, 1));
+  moonLight.visible = moonVisible;
+}
+updateCelestialBodies();
+
 const water = new Water({ width: 20, height: 15, color: "#38b8d8", opacity: .86, waveScale: .11, segments: 30 });
 water.mesh.position.set(-7, -1.65, -8);
 world.add(water.mesh);
@@ -195,6 +240,80 @@ function addDecorations() {
 }
 addDecorations();
 
+// Vegetación procedural distribuida por TODO el terreno, con semilla fija.
+// Evitamos el punto de inicio y el pequeño claro de construcciones.
+function scatterNature() {
+  let seed = 90210;
+  const random = () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+  const place = (model, x, z, scale = 1) => {
+    model.position.set(x, topAt(x, z), z);
+    model.scale.setScalar(scale);
+    world.add(model);
+    return model;
+  };
+  const point = () => {
+    for (let attempt = 0; attempt < 40; attempt++) {
+      const x = (random() - .5) * 96;
+      const z = (random() - .5) * 96;
+      if (Math.hypot(x, z) < 13) continue;
+      return [x, z];
+    }
+    return [(random() - .5) * 96, (random() - .5) * 96];
+  };
+
+  // Árboles repartidos por colinas y valles.
+  for (let i = 0; i < 24; i++) {
+    const [x, z] = point();
+    const tree = place(Models.tree({
+      height: 2.8 + random() * 1.7,
+      foliage: ["#438c59", "#528f4d", "#397b50", "#679b58"][Math.floor(random() * 4)],
+      fruit: random() > .78
+    }), x, z, .82 + random() * .42);
+    tree.rotation.y = random() * Math.PI * 2;
+    if (i < 9) {
+      const sway = new Animator(tree, {
+        clips: [AnimationPresets.sway(tree, { angle: .018 + random() * .018, duration: 3.5 + random() * 2.5 })]
+      });
+      sway.play("Sway", { loop: LoopRepeat });
+      animators.push(sway);
+    }
+  }
+
+  // Arbustos y flores crean grupos naturales entre los árboles.
+  for (let i = 0; i < 42; i++) {
+    const [x, z] = point();
+    const bush = place(Models.bush({ size: .65 + random() * .65, berries: random() > .48 }), x, z, .72 + random() * .55);
+    bush.rotation.y = random() * Math.PI * 2;
+  }
+  const petals = ["#f5a5c8", "#f3d36b", "#b9a4f4", "#f4f0df", "#e98b75"];
+  for (let i = 0; i < 68; i++) {
+    const [x, z] = point();
+    const flower = place(Models.flower({
+      height: .48 + random() * .62,
+      petalColor: petals[Math.floor(random() * petals.length)]
+    }), x, z, .7 + random() * .65);
+    flower.rotation.y = random() * Math.PI * 2;
+  }
+
+  for (let i = 0; i < 26; i++) {
+    const [x, z] = point();
+    const rock = place(Models.rock({ size: .28 + random() * .55, color: random() > .5 ? "#8b929c" : "#777f83" }), x, z, .75 + random() * .7);
+    rock.rotation.set(random() * .25, random() * Math.PI * 2, random() * .25);
+  }
+  for (let i = 0; i < 14; i++) {
+    const [x, z] = point();
+    const mushroom = place(Models.mushroom({
+      height: .55 + random() * .8,
+      capColor: random() > .5 ? "#d96d58" : "#d7a65e"
+    }), x, z, .75 + random() * .55);
+    mushroom.rotation.y = random() * Math.PI * 2;
+  }
+}
+scatterNature();
+
 const miningParticles = new ParticleEmitter({ count: 70, color: "#e7d39a", size: .12, lifetime: .55, speed: 2.4, spread: .65, gravity: -4, loop: false });
 world.add(miningParticles.points);
 const crystalGlow = new Glow({ color: "#6ee7f9", size: 4.5, opacity: .18, position: [-5, topAt(-5,4) + 3.1, 4] });
@@ -304,6 +423,7 @@ function update(delta) {
 
   updatePlayer(safeDelta);
   dayNight.update(safeDelta);
+  updateCelestialBodies();
   water.update(safeDelta);
   for (const animator of animators) animator.update(safeDelta);
   miningParticles.update(safeDelta);
@@ -412,6 +532,8 @@ $("model-file").addEventListener("change", async event => {
 
 window.addEventListener("beforeunload", () => {
   game.dispose(); water.dispose(); terrain.dispose(); miningParticles.dispose(); crystalGlow.dispose();
+  sunVisual.geometry.dispose(); sunVisual.material.dispose();
+  sunGlow.dispose(); moonVisual.geometry.dispose(); moonVisual.material.dispose();
   for (const animator of animators) animator.dispose();
   for (const mesh of blockMeshes) mesh.geometry?.dispose();
   for (const material of Object.values(BLOCK_TYPES)) material.material.dispose();
