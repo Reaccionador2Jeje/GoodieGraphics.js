@@ -1,27 +1,54 @@
 {
   "name": "goodiegraphics.js",
-  "version": "0.4.0",
-  "description": "A deliciously simple 3D graphics toolkit for the web, powered by Three.js.",
+  "version": "1.0.0",
+  "description": "A complete creative 3D toolkit for the web, powered by Three.js.",
   "type": "module",
-  "license": "MIT",
-  "keywords": ["3d", "threejs", "graphics", "webgl", "game-development", "3d-editor", "world-builder"],
+  "license": "BSD-3-Clause",
+  "keywords": [
+    "3d",
+    "threejs",
+    "graphics",
+    "webgl",
+    "game-development",
+    "3d-editor",
+    "world-builder",
+    "procedural-modeling",
+    "3d-model-builder",
+    "animation",
+    "gltf",
+    "obj",
+    "fbx",
+    "web-3d"
+  ],
   "main": "./src/index.js",
   "module": "./src/index.js",
   "exports": {
-    ".": "./src/index.js",
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./src/index.js"
+    },
     "./*": "./src/*"
   },
-  "files": ["src", "README.md", "LICENSE"],
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE",
+    "index.d.ts",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test"
+    "test": "node --test",
+    "check": "node --check src/index.js && node --check src/studio/studio.js"
   },
   "dependencies": {
     "three": "^0.180.0"
   },
   "devDependencies": {
     "vite": "^7.1.0"
-  }
+  },
+  "types": "./index.d.ts",
+  "sideEffects": false
 }
