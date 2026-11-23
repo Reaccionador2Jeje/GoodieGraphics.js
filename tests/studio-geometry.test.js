@@ -11,13 +11,15 @@ test("inspectGeometry counts meshes, vertices and triangles recursively", () => 
   const group = new THREE.Group();
   group.add(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1)));
   group.add(new THREE.Mesh(new THREE.TetrahedronGeometry(1)));
-  assert.deepEqual(inspectGeometry(group), { meshes: 2, vertices: 28, triangles: 16 });
+  assert.deepEqual(inspectGeometry(group), { meshes: 2, vertices: 36, triangles: 16 });
 });
 
 test("center operation recenters geometry without moving it in world space", () => {
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2));
   mesh.geometry.translate(3, 4, 5);
   mesh.position.set(7, 8, 9);
+  mesh.rotation.set(0.35, 0.7, -0.2);
+  mesh.scale.set(1.5, 0.8, 2);
   const before = new THREE.Box3().setFromObject(mesh);
   const originalGeometry = mesh.geometry;
   const result = editGeometry(mesh, "center");
