@@ -1,4 +1,4 @@
-import { Vector3 } from "three";
+import { BufferAttribute, BufferGeometry, Vector3 } from "three";
 
 /**
  * Non-destructive geometry operations for GoodieStudio.
@@ -68,4 +68,34 @@ export function editGeometry(root, operation, axis = "x") {
     mesh.userData.goodieGeometryEdited = true;
   }
   return inspectGeometry(root);
+}
+
+const typedArrays = {
+  Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array,
+  Int32Array, Uint32Array, Float32Array, Float64Array
+};
+
+function restoreAttribute(data) {
+  const ArrayType = typedArrays[data?.type];
+  if (!ArrayType || !Array.isArray(data.array) || !Number.isInteger(data.itemSize) || data.itemSize < 1 || data.itemSize > 4) {
+    throw new TypeError("Invalid serialized geometry attribute.");
+  }
+  return new BufferAttribute(new ArrayType(data.array), data.itemSize, Boolean(data.normalized));
+}
+
+export function restoreGeometryJSON(json) {
+  const data = json?.data;
+  if (!data || typeof data.attributes !== "object") throw new TypeError("Invalid serialized BufferGeometry.");
+  const geometry = new BufferGeometry();
+  for (const [name, attribute] of Object.entries(data.attributes)) geometry.setAttribute(name, restoreAttribute(attribute));
+  if (data.index) geometry.setIndex(restoreAttribute(data.index));
+  for (const group of data.groups || []) geometry.addGroup(group.start, group.count, group.materialIndex);
+  if (data.drawRange) geometry.setDrawRange(data.drawRange.start ?? 0, data.drawRange.count ?? Infinity);
+  for (const [name, attributes] of Object.entries(data.morphAttributes || {})) {
+    geometry.morphAttributes[name] = attributes.map(restoreAttribute);
+  }
+  geometry.morphTargetsRelative = Boolean(data.morphTargetsRelative);
+  geometry.userData = data.userData && typeof data.userData === "object" ? structuredClone(data.userData) : {};
+  refreshGeometry(geometry);
+  return geometry;
 }
