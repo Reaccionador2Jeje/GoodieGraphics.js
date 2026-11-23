@@ -244,7 +244,8 @@ Then visit `http://localhost:5173/studio.html`. GoodieStudio is a browser-based 
 - Add ten ready-made procedural assets and sixteen general-purpose geometry primitives.
 - Combine primitive shapes to start building custom models.
 - Select objects from the viewport or scene hierarchy.
-- Edit position, rotation and scale in the inspector.
+- Edit position, rotation and scale in the inspector or with interactive 3D transform gizmos in the viewport.
+- Switch between move, rotate and scale modes with toolbar buttons or W/E/R keyboard shortcuts.
 - Duplicate and delete objects.
 - Generate seeded terrain across all five GoodieWorld biomes.
 - Export a scene to a `.goodie.json` file and import it later.
