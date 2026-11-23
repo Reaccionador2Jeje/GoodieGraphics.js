@@ -25,7 +25,6 @@ try {
 const $ = (id) => document.getElementById(id);
 const viewport = $("viewport");
 const BLOCK = 1;
-const WORLD_RADIUS = 13;
 const BLOCK_TYPES = {
   grass: { label: "Hierba", material: GoodieShaders.voxel({ color: "#75a95a", roughness: 1, grain: .055, topLight: .19, edgeLight: .035 }) },
   dirt: { label: "Tierra", material: GoodieShaders.voxel({ color: "#96613d", roughness: 1, grain: .085, topLight: .10, edgeLight: .025 }) },
@@ -404,7 +403,7 @@ $("model-file").addEventListener("change", async event => {
     const loaded = await ModelLoader.load(url, { format: extension });
     const object = extension === "gltf" || extension === "glb" ? loaded.scene : loaded;
     object.scale.setScalar(.8);
-    object.position.set(Math.floor(player.x)+2, topAt(Math.floor(player.x)+2,Math.floor(player.z))+1, Math.floor(player.z));
+    object.position.set(Math.floor(player.x)+2, topAt(Math.floor(player.x)+2,Math.floor(player.z)), Math.floor(player.z));
     world.add(object);
     showToast("Modelo 3D importado al mundo");
   } catch (error) { showToast("No se pudo importar: " + error.message); }
