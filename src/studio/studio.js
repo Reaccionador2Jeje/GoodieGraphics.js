@@ -158,6 +158,69 @@ function field(axis, value, kind) {
   return cell;
 }
 
+function collectMaterials(root = selected) {
+  if (!root) return [];
+  const materials = [];
+  root.traverse((node) => {
+    if (!node.isMesh) return;
+    const list = Array.isArray(node.material) ? node.material : [node.material];
+    list.forEach((material) => { if (material && !materials.includes(material)) materials.push(material); });
+  });
+  return materials;
+}
+
+function readMaterialSettings(root = selected) {
+  const material = collectMaterials(root)[0];
+  if (!material) return null;
+  return {
+    color: material.color?.getHexString() ? "#" + material.color.getHexString() : "#ffffff",
+    roughness: Number.isFinite(material.roughness) ? material.roughness : 0.7,
+    metalness: Number.isFinite(material.metalness) ? material.metalness : 0,
+    opacity: Number.isFinite(material.opacity) ? material.opacity : 1,
+    wireframe: Boolean(material.wireframe)
+  };
+}
+
+function applyMaterialSettings(settings, root = selected, dirty = true) {
+  const materials = collectMaterials(root);
+  if (!materials.length) return;
+  for (const material of materials) {
+    if (material.color && settings.color) material.color.set(settings.color);
+    if ("roughness" in material) material.roughness = THREE.MathUtils.clamp(Number(settings.roughness), 0, 1);
+    if ("metalness" in material) material.metalness = THREE.MathUtils.clamp(Number(settings.metalness), 0, 1);
+    if ("opacity" in material) {
+      material.opacity = THREE.MathUtils.clamp(Number(settings.opacity), 0, 1);
+      material.transparent = material.opacity < 1;
+    }
+    if ("wireframe" in material) material.wireframe = Boolean(settings.wireframe);
+    material.needsUpdate = true;
+  }
+  if (dirty) markChanged();
+}
+
+function inspectorHeading(label) {
+  const heading = document.createElement("div");
+  heading.className = "inspector-group";
+  heading.textContent = label;
+  return heading;
+}
+
+function materialControl(labelText, type, value, onInput, { min, max, step } = {}) {
+  const wrapper = document.createElement("label");
+  wrapper.className = "material-control";
+  const label = document.createElement("span");
+  label.textContent = labelText;
+  const input = document.createElement("input");
+  input.type = type;
+  input.value = String(value);
+  if (min !== undefined) input.min = String(min);
+  if (max !== undefined) input.max = String(max);
+  if (step !== undefined) input.step = String(step);
+  input.addEventListener("input", () => onInput(input.value));
+  wrapper.append(label, input);
+  return wrapper;
+}
+
 function renderInspector() {
   const panel = $("inspector");
   panel.innerHTML = "";
@@ -174,14 +237,36 @@ function renderInspector() {
     ["rotation", "ROTATION · DEGREES", { x: selected.rotation.x * 180 / Math.PI, y: selected.rotation.y * 180 / Math.PI, z: selected.rotation.z * 180 / Math.PI }],
     ["scale", "SCALE", selected.scale]
   ]) {
-    const heading = document.createElement("div");
-    heading.className = "inspector-group";
-    heading.textContent = label;
     const gridFields = document.createElement("div");
     gridFields.className = "transform-grid";
     ["x", "y", "z"].forEach((axis) => gridFields.appendChild(field(axis, values[axis], kind)));
-    panel.append(heading, gridFields);
+    panel.append(inspectorHeading(label), gridFields);
   }
+
+  const settings = readMaterialSettings();
+  panel.appendChild(inspectorHeading("MATERIAL"));
+  if (!settings) {
+    const note = document.createElement("p");
+    note.className = "hint";
+    note.textContent = "This object has no editable mesh materials.";
+    panel.appendChild(note);
+    return;
+  }
+  const materialGrid = document.createElement("div");
+  materialGrid.className = "material-grid";
+  materialGrid.appendChild(materialControl("Base color", "color", settings.color, (value) => applyMaterialSettings({ color: value })));
+  materialGrid.appendChild(materialControl("Roughness", "range", settings.roughness, (value) => applyMaterialSettings({ roughness: value }), { min: 0, max: 1, step: 0.01 }));
+  materialGrid.appendChild(materialControl("Metalness", "range", settings.metalness, (value) => applyMaterialSettings({ metalness: value }), { min: 0, max: 1, step: 0.01 }));
+  materialGrid.appendChild(materialControl("Opacity", "range", settings.opacity, (value) => applyMaterialSettings({ opacity: value }), { min: 0, max: 1, step: 0.01 }));
+  const wireframeLabel = document.createElement("label");
+  wireframeLabel.className = "material-toggle";
+  const wireframe = document.createElement("input");
+  wireframe.type = "checkbox";
+  wireframe.checked = settings.wireframe;
+  wireframe.addEventListener("change", () => applyMaterialSettings({ wireframe: wireframe.checked }));
+  wireframeLabel.append(wireframe, document.createTextNode("Wireframe"));
+  materialGrid.appendChild(wireframeLabel);
+  panel.appendChild(materialGrid);
 }
 
 function refresh() { renderHierarchy(); renderInspector(); }
@@ -338,7 +423,8 @@ function serializeScene() {
       name: object.name,
       position: object.position.toArray(),
       rotation: [object.rotation.x, object.rotation.y, object.rotation.z],
-      scale: object.scale.toArray()
+      scale: object.scale.toArray(),
+      material: readMaterialSettings(object)
     }))
   };
 }
@@ -377,6 +463,17 @@ async function importSceneText(text) {
     object.position.fromArray(item.position || [0, 0, 0]);
     object.rotation.set(...(item.rotation || [0, 0, 0]));
     object.scale.fromArray(item.scale || [1, 1, 1]);
+    if (item.material && typeof item.material === "object") {
+      const material = item.material;
+      const settings = {
+        color: /^#[0-9a-f]{6}$/i.test(material.color) ? material.color : "#ffffff",
+        roughness: Number.isFinite(Number(material.roughness)) ? THREE.MathUtils.clamp(Number(material.roughness), 0, 1) : 0.7,
+        metalness: Number.isFinite(Number(material.metalness)) ? THREE.MathUtils.clamp(Number(material.metalness), 0, 1) : 0,
+        opacity: Number.isFinite(Number(material.opacity)) ? THREE.MathUtils.clamp(Number(material.opacity), 0, 1) : 1,
+        wireframe: Boolean(material.wireframe)
+      };
+      applyMaterialSettings(settings, object, false);
+    }
   }
   $("fileInput").value = ""; refresh(); markClean("● Imported");
 }
