@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#10151d" />
+    <meta name="description" content="Build colorful 3D worlds in GoodieStudio, the visual editor for GoodieGraphics.js." />
+    <title>GoodieStudio — GoodieGraphics.js</title>
+    <link rel="stylesheet" href="/src/studio/studio.css" />
+  </head>
+  <body>
+    <div class="studio-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="GoodieGraphics home"><span class="brand-mark">G</span><span>Goodie<span class="brand-light">Studio</span><small>GOODIEGRAPHICS.JS</small></span></a>
+        <div class="top-actions">
+          <span class="save-state" id="saveState">● Ready</span>
+          <button class="button ghost" id="newScene">New</button>
+          <button class="button ghost" id="importScene">Import</button>
+          <button class="button primary" id="exportScene">Export scene ↗</button>
+          <input id="fileInput" type="file" accept=".json,application/json" hidden />
+        </div>
+      </header>
+      <main class="workspace">
+        <aside class="sidebar left-panel">
+          <div class="panel-heading"><div><span class="eyebrow">BUILD</span><h2>Asset library</h2></div><span class="count" id="assetCount">10</span></div>
+          <p class="muted intro">Tap an asset to add it to your world.</p>
+          <div class="asset-grid" id="assetGrid">
+            <button class="asset-card" data-model="tree"><span class="asset-icon">🌳</span><b>Tree</b><small>Nature</small></button>
+            <button class="asset-card" data-model="house"><span class="asset-icon">🏠</span><b>House</b><small>Buildings</small></button>
+            <button class="asset-card" data-model="rock"><span class="asset-icon">🪨</span><b>Rock</b><small>Nature</small></button>
+            <button class="asset-card" data-model="crystal"><span class="asset-icon">💎</span><b>Crystal</b><small>Decor</small></button>
+            <button class="asset-card" data-model="mushroom"><span class="asset-icon">🍄</span><b>Mushroom</b><small>Nature</small></button>
+            <button class="asset-card" data-model="flower"><span class="asset-icon">🌼</span><b>Flower</b><small>Nature</small></button>
+            <button class="asset-card" data-model="bush"><span class="asset-icon">🌿</span><b>Bush</b><small>Nature</small></button>
+            <button class="asset-card" data-model="barrel"><span class="asset-icon">🛢️</span><b>Barrel</b><small>Props</small></button>
+            <button class="asset-card" data-model="lamp"><span class="asset-icon">💡</span><b>Lamp</b><small>Props</small></button>
+            <button class="asset-card" data-model="fence"><span class="asset-icon">🪵</span><b>Fence</b><small>Props</small></button>
+          </div>
+          <div class="panel-divider"></div>
+          <div class="panel-heading"><div><span class="eyebrow">WORLD</span><h2>Terrain</h2></div></div>
+          <label class="field-label" for="biome">Biome</label>
+          <select id="biome" class="control"><option value="meadow">Meadow</option><option value="forest">Forest</option><option value="desert">Desert</option><option value="snow">Snow</option><option value="volcanic">Volcanic</option></select>
+          <div class="field-row"><label class="field-label" for="seed">Seed</label><input class="control" id="seed" type="number" value="7" /></div>
+          <label class="field-label" for="terrainHeight">Elevation <output id="heightValue">4</output></label>
+          <input id="terrainHeight" class="range" type="range" min="0" max="12" step=".5" value="4" />
+          <button class="button full" id="applyTerrain">Regenerate terrain</button>
+          <p class="hint">Terrain generation is seeded. Reuse a seed to recreate the same landscape.</p>
+        </aside>
+        <section class="viewport-wrap">
+          <div class="viewport" id="viewport">
+            <div class="viewport-top"><div class="scene-title"><span class="live-dot"></span><span>Untitled world</span><span class="scene-tag">3D SCENE</span></div><div class="viewport-tools"><button class="tool-button active" id="orbitTool" title="Orbit camera">◉</button><button class="tool-button" id="focusTool" title="Focus selection">⌖</button><button class="tool-button" id="resetCamera" title="Reset camera">↺</button></div></div>
+            <div class="viewport-hint">DRAG TO ORBIT <span>·</span> PINCH / SCROLL TO ZOOM <span>·</span> TAP AN OBJECT TO SELECT</div>
+            <div id="canvasHost"></div>
+            <div class="selection-toast" id="selectionToast">Nothing selected</div>
+          </div>
+          <div class="bottom-bar"><div><span class="status-dot"></span><span id="objectStatus">0 objects in scene</span></div><div class="bottom-shortcuts"><span>GOODIE STUDIO</span><span>v0.4.0</span></div></div>
+        </section>
+        <aside class="sidebar right-panel">
+          <section class="hierarchy-section"><div class="panel-heading"><div><span class="eyebrow">SCENE</span><h2>Hierarchy</h2></div><span class="count" id="objectCount">0</span></div><div class="object-list" id="objectList"><div class="empty-state">Your scene is empty.<br/>Add an asset to begin.</div></div></section>
+          <div class="panel-divider"></div>
+          <section class="inspector-section"><div class="panel-heading"><div><span class="eyebrow">PROPERTIES</span><h2>Inspector</h2></div></div><div id="inspector"><div class="empty-state">Select an object to edit its properties.</div></div></section>
+          <div class="panel-divider"></div>
+          <section><div class="panel-heading"><div><span class="eyebrow">QUICK ACTIONS</span><h2>Tools</h2></div></div><div class="quick-actions"><button class="button" id="duplicateObject">Duplicate</button><button class="button danger" id="deleteObject">Delete</button></div></section>
+        </aside>
+      </main>
+      <footer class="footer"><span>🍰 Make the Web 3D Delicious.</span><span>Built with Three.js · Designed for desktop and mobile</span></footer>
+    </div>
+    <script type="module" src="/src/studio/studio.js"></script>
+  </body>
+</html>
