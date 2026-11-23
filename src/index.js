@@ -5,5 +5,7 @@ export { Materials } from "./materials/Materials.js";
 export { ParticleEmitter } from "./effects/ParticleEmitter.js";
 export { Water } from "./effects/Water.js";
 export { Glow } from "./effects/Glow.js";
+export { Terrain } from "./world/Terrain.js";
+export { DayNightCycle } from "./world/DayNightCycle.js";
 
-export const version = "0.2.0";
+export const version = "0.3.0";
