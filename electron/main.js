@@ -82,8 +82,9 @@ function createWindow() {
     windowRef.loadFile(path.join(here, "../dist/studio.html"));
   }
   windowRef.on("close", (event) => {
-    if (!hasUnsavedChanges || confirmingClose) return;
+    if (!hasUnsavedChanges) return;
     event.preventDefault();
+    if (confirmingClose) return;
     confirmingClose = true;
     dialog.showMessageBox(windowRef, {
       type: "warning",
