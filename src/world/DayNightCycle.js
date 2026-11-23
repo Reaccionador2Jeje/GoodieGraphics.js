@@ -2,7 +2,7 @@ import * as THREE from "three";
 
 /** Smooth day/night lighting controller for a GoodieGraphics World. */
 export class DayNightCycle {
-  constructor(world, { duration = 180, startAt = 0.25, dayIntensity = 2.2, nightIntensity = 0.12 } = {}) {
+  constructor(world, { duration = 180, startAt = 0.5, dayIntensity = 2.2, nightIntensity = 0.12 } = {}) {
     if (!world?.scene?.isScene || !world.sun || !world.ambientLight) {
       throw new TypeError("DayNightCycle expects a GoodieGraphics World.");
     }
