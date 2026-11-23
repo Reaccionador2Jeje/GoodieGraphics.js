@@ -65,6 +65,7 @@ export function editGeometry(root, operation, axis = "x") {
     }
     refreshGeometry(geometry);
     mesh.geometry = geometry;
+    mesh.userData.goodieGeometryEdited = true;
   }
   return inspectGeometry(root);
 }
