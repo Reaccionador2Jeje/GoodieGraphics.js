@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { TransformControls } from "three/addons/controls/TransformControls.js";
 import { Models } from "../models/Models.js";
 import { GoodieShapes } from "../models/Geometry.js";
 import { Terrain } from "../world/Terrain.js";
@@ -47,6 +48,21 @@ controls.maxPolarAngle = Math.PI * 0.48;
 controls.minDistance = 4;
 controls.maxDistance = 75;
 
+const transformControls = new TransformControls(camera, renderer.domElement);
+transformControls.setMode("translate");
+transformControls.setSpace("world");
+transformControls.size = 0.85;
+scene.add(transformControls.getHelper());
+transformControls.addEventListener("dragging-changed", (event) => {
+  controls.enabled = !event.value;
+});
+transformControls.addEventListener("objectChange", () => {
+  markChanged();
+});
+transformControls.addEventListener("mouseUp", () => {
+  renderInspector();
+});
+
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 const objects = [];
@@ -93,6 +109,8 @@ function makeShape(type) {
 
 function selectObject(object) {
   selected = object;
+  if (selected) transformControls.attach(selected);
+  else transformControls.detach();
   $("selectionToast").textContent = object ? object.name : "Nothing selected";
   renderHierarchy();
   renderInspector();
@@ -254,6 +272,30 @@ $("duplicateObject").addEventListener("click", () => {
   selectObject(copy);
   markChanged();
 });
+function setTransformMode(mode) {
+  if (!["translate", "rotate", "scale"].includes(mode)) return;
+  transformControls.setMode(mode);
+  document.querySelectorAll("[data-transform-mode]").forEach((button) => {
+    const active = button.dataset.transformMode === mode;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+}
+document.querySelectorAll("[data-transform-mode]").forEach((button) => {
+  button.addEventListener("click", () => setTransformMode(button.dataset.transformMode));
+});
+window.addEventListener("keydown", (event) => {
+  if (event.ctrlKey || event.metaKey || event.altKey) return;
+  const target = event.target;
+  if (target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
+  const modes = { w: "translate", e: "rotate", r: "scale" };
+  const mode = modes[event.key.toLowerCase()];
+  if (mode) {
+    setTransformMode(mode);
+    event.preventDefault();
+  }
+});
+
 function focusSelection() {
   if (!selected) return;
   const box = new THREE.Box3().setFromObject(selected);
@@ -267,9 +309,9 @@ $("resetCamera").addEventListener("click", () => {
   controls.update();
 });
 
-renderer.domElement.addEventListener("pointerdown", (event) => { pointerDown = { x: event.clientX, y: event.clientY }; });
+renderer.domElement.addEventListener("pointerdown", (event) => { pointerDown = { x: event.clientX, y: event.clientY, gizmo: transformControls.axis !== null }; });
 renderer.domElement.addEventListener("pointerup", (event) => {
-  if (!pointerDown || Math.hypot(event.clientX - pointerDown.x, event.clientY - pointerDown.y) > 7) { pointerDown = null; return; }
+  if (!pointerDown || pointerDown.gizmo || transformControls.dragging || Math.hypot(event.clientX - pointerDown.x, event.clientY - pointerDown.y) > 7) { pointerDown = null; return; }
   pointerDown = null;
   const rect = renderer.domElement.getBoundingClientRect();
   pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -396,5 +438,7 @@ renderer.setAnimationLoop(() => {
 });
 window.addEventListener("beforeunload", () => {
   resizeObserver.disconnect();
+  transformControls.dispose();
+  controls.dispose();
   renderer.dispose();
 });
