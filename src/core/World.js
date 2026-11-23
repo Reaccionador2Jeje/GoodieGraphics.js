@@ -22,8 +22,11 @@ export class World {
   }
 
   add(...objects) {
-    for (const object of objects.flat()) {
-      if (!object?.isObject3D) throw new TypeError("World.add() expects Three.js Object3D instances.");
+    const items = objects.flat();
+    if (items.some((object) => !object?.isObject3D)) {
+      throw new TypeError("World.add() expects Three.js Object3D instances.");
+    }
+    for (const object of items) {
       this.scene.add(object);
       this.objects.add(object);
     }
@@ -31,7 +34,8 @@ export class World {
   }
 
   remove(object) {
-    this.scene.remove(object);
+    if (!object?.isObject3D) return this;
+    object.removeFromParent();
     this.objects.delete(object);
     return this;
   }
@@ -42,6 +46,9 @@ export class World {
   }
 
   addGround({ size = 100, color = "#79a96b", y = 0 } = {}) {
+    if (!Number.isFinite(size) || size <= 0 || !Number.isFinite(y)) {
+      throw new RangeError("Ground size must be positive and y must be finite.");
+    }
     const geometry = new THREE.PlaneGeometry(size, size);
     const material = new THREE.MeshStandardMaterial({ color, roughness: 1 });
     const ground = new THREE.Mesh(geometry, material);
