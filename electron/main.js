@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const devServer = process.env.GOODIE_DEV_SERVER;
 let windowRef;
+let hasUnsavedChanges = false;
+let confirmingClose = false;
 const filters = [{ name: "GoodieStudio scene", extensions: ["json"] }];
 
 function command(name) {
@@ -28,6 +30,10 @@ function buildMenu() {
 }
 
 function registerHandlers() {
+  ipcMain.handle("goodie:set-dirty", (_event, dirty) => {
+    hasUnsavedChanges = dirty === true;
+    return hasUnsavedChanges;
+  });
   ipcMain.handle("goodie:open", async () => {
     const result = await dialog.showOpenDialog(windowRef, { title: "Open GoodieStudio scene", properties: ["openFile"], filters });
     if (result.canceled || !result.filePaths[0]) return null;
@@ -39,6 +45,7 @@ function registerHandlers() {
     const result = await dialog.showSaveDialog(windowRef, { title: "Export GoodieStudio scene", defaultPath, filters });
     if (result.canceled || !result.filePath) return false;
     await writeFile(result.filePath, content, "utf8");
+    hasUnsavedChanges = false;
     return true;
   });
   ipcMain.handle("goodie:confirm-new", async () => {
@@ -74,7 +81,28 @@ function createWindow() {
   } else {
     windowRef.loadFile(path.join(here, "../dist/studio.html"));
   }
-  windowRef.on("closed", () => { windowRef = null; });
+  windowRef.on("close", (event) => {
+    if (!hasUnsavedChanges || confirmingClose) return;
+    event.preventDefault();
+    confirmingClose = true;
+    dialog.showMessageBox(windowRef, {
+      type: "warning",
+      title: "Unsaved scene",
+      message: "GoodieStudio has unsaved changes.",
+      detail: "Export your scene before closing, or discard the changes.",
+      buttons: ["Cancel", "Discard changes"],
+      defaultId: 0,
+      cancelId: 0,
+      noLink: true
+    }).then(({ response }) => {
+      confirmingClose = false;
+      if (response === 1) {
+        hasUnsavedChanges = false;
+        if (windowRef && !windowRef.isDestroyed()) windowRef.close();
+      }
+    }).catch(() => { confirmingClose = false; });
+  });
+  windowRef.on("closed", () => { windowRef = null; hasUnsavedChanges = false; confirmingClose = false; });
 }
 
 app.whenReady().then(() => {
