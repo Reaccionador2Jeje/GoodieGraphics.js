@@ -155,6 +155,14 @@ function addDecorations() {
   const house = Models.house({ width: 3.2, height: 2.8, wallColor: "#dfc99e", roofColor: "#8f5846" });
   house.position.set(4, topAt(4,3) + 1, 3); world.add(house);
   const barrel = Models.barrel({ height: 1.1 }); barrel.position.set(6, topAt(6,3) + 1, 3); world.add(barrel);
+  const mushroom = Models.mushroom({ height: 1.25, capColor: "#d96d58" });
+  mushroom.position.set(7, topAt(7,4) + 1, 4); world.add(mushroom);
+  const bush = Models.bush({ size: 1.25, berries: true });
+  bush.position.set(2, topAt(2,6) + 1, 6); world.add(bush);
+  const fence = Models.fence({ width: 2.4, height: .85 });
+  fence.position.set(5, topAt(5,5) + 1, 5); world.add(fence);
+  const beacon = GoodieShapes.sphere({ radius: .22, widthSegments: 12, heightSegments: 8, color: Materials.glow("#a9ef83") });
+  beacon.position.set(-7, topAt(-7,-5) + 2.2, -5); world.add(beacon);
   const lamp = Models.lamp({ height: 3 }); lamp.position.set(4, topAt(4,5) + 1, 5); world.add(lamp);
   const lampGlow = new Glow({ color: "#ffdf91", size: 3, opacity: .48, position: [4, lamp.position.y + 2.7, 5] });
   world.add(lampGlow.sprite);
