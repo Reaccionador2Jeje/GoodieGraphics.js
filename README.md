@@ -2,7 +2,7 @@
 
 **Make the Web 3D Delicious.**
 
-GoodieGraphics.js is a high-level 3D graphics toolkit for the web, powered by Three.js. GoodieStudio is available in the browser and as a cross-platform desktop application powered by Electron. It provides a general-purpose geometry library, a custom model builder, 3D asset import, procedural examples, reusable real-time effects, animation tools and seeded world generation.
+GoodieGraphics.js is a high-level 3D graphics toolkit for the web, powered by Three.js. GoodieStudio includes a nested scene hierarchy with multi-selection and group editing. GoodieStudio is available in the browser and as a cross-platform desktop application powered by Electron. It provides a general-purpose geometry library, a custom model builder, 3D asset import, procedural examples, reusable real-time effects, animation tools and seeded world generation.
 
 > **Version 1.0.0** — the first stable public API. GoodieGraphics.js is not published to npm yet; install it from this repository for now.
 
