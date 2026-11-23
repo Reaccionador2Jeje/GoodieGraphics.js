@@ -4,6 +4,7 @@ import { TransformControls } from "three/addons/controls/TransformControls.js";
 import { Models } from "../models/Models.js";
 import { GoodieShapes } from "../models/Geometry.js";
 import { Terrain } from "../world/Terrain.js";
+import { editGeometry, inspectGeometry } from "./GeometryTools.js";
 
 const $ = (id) => document.getElementById(id);
 document.documentElement.classList.toggle("desktop-app", Boolean(window.goodieDesktop?.isDesktop));
@@ -260,6 +261,43 @@ function renderInspector() {
     ["x", "y", "z"].forEach((axis) => gridFields.appendChild(field(axis, values[axis], kind)));
     panel.append(inspectorHeading(label), gridFields);
   }
+
+  const geometryInfo = inspectGeometry(selected);
+  panel.appendChild(inspectorHeading("GEOMETRY"));
+  const geometryStats = document.createElement("p");
+  geometryStats.className = "hint geometry-stats";
+  geometryStats.textContent = geometryInfo.meshes + " meshes · " + geometryInfo.vertices.toLocaleString() + " vertices · " + geometryInfo.triangles.toLocaleString() + " triangles";
+  panel.appendChild(geometryStats);
+  const geometryActions = document.createElement("div");
+  geometryActions.className = "geometry-actions";
+  const addGeometryAction = (label, operation, axis) => {
+    const button = document.createElement("button");
+    button.type = "button"; button.className = "button"; button.textContent = label;
+    button.disabled = selected.userData.locked || geometryInfo.meshes === 0;
+    button.addEventListener("click", () => {
+      if (!selected || selected.userData.locked) return;
+      const result = editGeometry(selected, operation, axis);
+      if (result.meshes) { markChanged(); renderInspector(); }
+    });
+    geometryActions.appendChild(button);
+  };
+  addGeometryAction("Center pivot", "center");
+  addGeometryAction("Recalculate normals", "normals");
+  panel.appendChild(geometryActions);
+  const mirrorRow = document.createElement("div");
+  mirrorRow.className = "geometry-actions geometry-mirror";
+  for (const axis of ["x", "y", "z"]) {
+    const button = document.createElement("button");
+    button.type = "button"; button.className = "button"; button.textContent = "Mirror " + axis.toUpperCase();
+    button.disabled = selected.userData.locked || geometryInfo.meshes === 0;
+    button.addEventListener("click", () => {
+      if (!selected || selected.userData.locked) return;
+      const result = editGeometry(selected, "mirror", axis);
+      if (result.meshes) { markChanged(); renderInspector(); }
+    });
+    mirrorRow.appendChild(button);
+  }
+  panel.appendChild(mirrorRow);
 
   const settings = readMaterialSettings();
   panel.appendChild(inspectorHeading("MATERIAL"));
