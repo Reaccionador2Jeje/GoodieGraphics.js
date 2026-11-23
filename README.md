@@ -2,7 +2,7 @@
 
 **Make the Web 3D Delicious.**
 
-GoodieGraphics.js is a high-level 3D graphics toolkit for the web, powered by Three.js. It combines a friendly scene API, procedural 3D assets and reusable real-time effects.
+GoodieGraphics.js is a high-level 3D graphics toolkit for the web, powered by Three.js. It combines a friendly scene API, procedural 3D assets, reusable real-time effects and seeded world generation.
 
 > Early development: APIs may change while the project grows. The package is not published to npm yet.
 
@@ -22,27 +22,55 @@ import * as Goodie from "./src/index.js";
 
 const game = new Goodie.Game({ container: document.querySelector("#app") });
 const world = new Goodie.World();
+const terrain = new Goodie.Terrain({ biome: "forest", seed: 42 });
 
-world.add(
-  Goodie.Models.tree(),
-  Goodie.Models.house(),
-  Goodie.Models.crystal()
-);
-world.addGround();
-
-const water = new Goodie.Water({ width: 12, height: 8 });
-world.add(water.mesh);
-
-const particles = new Goodie.ParticleEmitter({ count: 80, color: "#9cecff" });
-world.add(particles.points);
-
+world.add(terrain.mesh, Goodie.Models.tree());
+const cycle = new Goodie.DayNightCycle(world);
 game.setWorld(world);
-game.onUpdate((delta) => {
-  water.update(delta);
-  particles.update(delta);
-});
+game.onUpdate((delta) => cycle.update(delta));
 game.start();
 ```
+
+## GoodieWorld: procedural terrain
+
+Create a seeded terrain with biome colors and query its elevation.
+
+```js
+const terrain = new Goodie.Terrain({
+  width: 100,
+  depth: 100,
+  segments: 120,
+  seed: 42,
+  biome: "forest",
+  amplitude: 5,
+  frequency: 0.035
+});
+
+world.add(terrain.mesh);
+const tree = Goodie.Models.tree();
+tree.position.set(8, terrain.getHeightAt(8, -4), -4);
+world.add(tree);
+```
+
+Available biomes: `meadow`, `forest`, `desert`, `snow`, `volcanic`.
+
+Use the same seed and settings to reproduce the same terrain. Increase `segments` for more detail; lower it for better performance on phones. Call `terrain.dispose()` when removing the terrain permanently.
+
+## Day/night cycle
+
+```js
+const dayNight = new Goodie.DayNightCycle(world, {
+  duration: 180, // seconds for a full cycle
+  startAt: 0.5   // 0 = midnight, 0.5 = midday
+});
+
+game.onUpdate((delta) => dayNight.update(delta));
+dayNight.setTime(0.75); // sunset
+dayNight.pause();
+dayNight.resume();
+```
+
+The cycle updates sunlight, hemisphere lighting, sky background and fog color.
 
 ## Procedural model library
 
@@ -59,75 +87,46 @@ game.start();
 | `Models.lamp()` | Decorative warm-glowing park lamp |
 | `Models.fence()` | Reusable wooden fence segment |
 
-All models return Three.js `Group` objects.
-
 ## GoodieFX effects
 
 ### ParticleEmitter
 
-Creates a lightweight point-based particle system.
-
 ```js
 const dust = new Goodie.ParticleEmitter({
-  count: 120,
-  color: "#fff0b5",
-  size: 0.14,
-  lifetime: 2,
-  speed: 1.2,
-  spread: 1.5,
-  gravity: -0.7,
-  loop: true
+  count: 120, color: "#fff0b5", size: 0.14,
+  lifetime: 2, speed: 1.2, spread: 1.5, gravity: -0.7
 });
 world.add(dust.points);
-
 game.onUpdate((delta) => dust.update(delta));
-dust.burst(40); // one-time burst
-dust.stop();    // pause simulation
-dust.start();   // resume simulation
-dust.dispose(); // release GPU resources
+dust.burst(40);
+dust.dispose();
 ```
-
-The emitter uses a fixed particle buffer and CPU updates. Keep particle counts modest on mobile devices.
 
 ### Water
 
-Adds a stylized animated water surface with a compact shader.
-
 ```js
-const lake = new Goodie.Water({
-  width: 18,
-  height: 12,
-  color: "#35bde8",
-  opacity: 0.85,
-  waveSpeed: 1,
-  waveScale: 0.16
-});
+const lake = new Goodie.Water({ width: 18, height: 12, color: "#35bde8" });
 world.add(lake.mesh);
 game.onUpdate((delta) => lake.update(delta));
 ```
 
 ### Glow
 
-Creates a soft additive sprite for magical props, lamps and crystals. It uses a small canvas-generated texture.
-
 ```js
-const aura = new Goodie.Glow({
-  color: "#8be9ff",
-  size: 2,
-  opacity: 0.7,
-  position: [0, 1, 0]
-});
+const aura = new Goodie.Glow({ color: "#8be9ff", size: 2, opacity: 0.7 });
 world.add(aura.sprite);
 aura.setColor("#ffc4ed");
 aura.dispose();
 ```
 
-Call `dispose()` on effects when removing them permanently to release their GPU resources.
+Dispose effects when removing them permanently to release GPU resources.
 
 ## Core modules
 
 - `Game`: renderer, camera, animation loop and resize handling.
 - `World`: scene container, lighting and ground helper.
+- `Terrain`: seeded procedural terrain and biome palettes.
+- `DayNightCycle`: dynamic sun, ambient light, sky and fog.
 - `Models`: procedural 3D asset library.
 - `Materials`: reusable material presets.
 - `ParticleEmitter`, `Water`, `Glow`: GoodieFX real-time effects.
@@ -137,10 +136,6 @@ Call `dispose()` on effects when removing them permanently to release their GPU 
 - `npm run dev`: start the Vite showcase.
 - `npm run build`: create a production build.
 - `npm test`: run the Node.js test suite.
-
-## Development
-
-Three.js is the rendering foundation. GoodieGraphics.js focuses on a higher-level API, procedural assets and creator-friendly workflows rather than reimplementing a WebGL renderer.
 
 ## License
 
