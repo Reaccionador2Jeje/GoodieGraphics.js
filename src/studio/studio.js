@@ -201,10 +201,11 @@ function removeSelected() {
 $("deleteObject").addEventListener("click", removeSelected);
 $("duplicateObject").addEventListener("click", () => {
   if (!selected) return;
-  const copy = makeModel(selected.userData.goodieType);
-  copy.position.copy(selected.position).add(new THREE.Vector3(1.5, 0, 1.5));
-  copy.rotation.copy(selected.rotation);
-  copy.scale.copy(selected.scale);
+  const source = selected;
+  const copy = makeModel(source.userData.goodieType);
+  copy.position.copy(source.position).add(new THREE.Vector3(1.5, 0, 1.5));
+  copy.rotation.copy(source.rotation);
+  copy.scale.copy(source.scale);
   markChanged();
   renderInspector();
 });
