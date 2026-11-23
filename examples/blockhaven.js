@@ -287,7 +287,7 @@ function updatePlayer(delta) {
 
 function update(delta) {
   updatePlayer(delta);
-  day.update(delta);
+  dayNight.update(delta);
   water.update(delta);
   for (const animator of animators) animator.update(delta);
   miningParticles.update(delta);
