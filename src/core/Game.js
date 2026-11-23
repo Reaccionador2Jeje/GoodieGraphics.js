@@ -12,10 +12,15 @@ export class Game {
     pixelRatio = Math.min(globalThis.devicePixelRatio || 1, 2),
     camera = {}
   } = {}) {
+    if (!container?.appendChild) throw new TypeError("Game requires a DOM container element.");
+    if (!Number.isFinite(pixelRatio) || pixelRatio <= 0) throw new RangeError("pixelRatio must be a positive finite number.");
     this.container = container;
+    this.disposed = false;
     this.renderer = new THREE.WebGLRenderer({ antialias, alpha: false });
     this.renderer.setPixelRatio(pixelRatio);
-    this.renderer.setSize(width ?? container.clientWidth ?? innerWidth, height ?? container.clientHeight ?? innerHeight);
+    const viewWidth = Math.max(1, width ?? (container.clientWidth || window.innerWidth));
+    const viewHeight = Math.max(1, height ?? (container.clientHeight || window.innerHeight));
+    this.renderer.setSize(viewWidth, viewHeight);
     this.renderer.shadowMap.enabled = shadows;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -26,7 +31,7 @@ export class Game {
 
     this.camera = new THREE.PerspectiveCamera(
       camera.fov ?? 60,
-      this.renderer.domElement.clientWidth / Math.max(1, this.renderer.domElement.clientHeight),
+      viewWidth / viewHeight,
       camera.near ?? 0.1,
       camera.far ?? 1000
     );
@@ -42,17 +47,20 @@ export class Game {
   }
 
   setWorld(world) {
+    if (this.disposed) throw new Error("This Game has been disposed.");
     if (!world?.scene?.isScene) throw new TypeError("Game.setWorld() expects a GoodieGraphics World.");
     this.world = world;
     return this;
   }
 
   onUpdate(callback) {
+    if (callback !== null && typeof callback !== "function") throw new TypeError("onUpdate() expects a function or null.");
     this._onUpdate = callback;
     return this;
   }
 
   start() {
+    if (this.disposed) throw new Error("This Game has been disposed.");
     if (this.running) return this;
     this.running = true;
     this._lastTime = performance.now();
@@ -85,8 +93,12 @@ export class Game {
   }
 
   dispose() {
+    if (this.disposed) return;
     this.stop();
     this.renderer.dispose();
     this.renderer.domElement.remove();
+    this._onUpdate = null;
+    this.world = null;
+    this.disposed = true;
   }
 }
