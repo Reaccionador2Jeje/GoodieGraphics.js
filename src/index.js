@@ -7,5 +7,8 @@ export { Water } from "./effects/Water.js";
 export { Glow } from "./effects/Glow.js";
 export { Terrain } from "./world/Terrain.js";
 export { DayNightCycle } from "./world/DayNightCycle.js";
+export { Animator } from "./animations/Animator.js";
+export { AnimationBuilder } from "./animations/AnimationBuilder.js";
+export { AnimationPresets } from "./animations/AnimationPresets.js";
 
 export const version = "0.4.0";
