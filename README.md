@@ -4,7 +4,7 @@
 
 GoodieGraphics.js is a high-level 3D graphics toolkit for the web, powered by Three.js. It provides a general-purpose geometry library, a custom model builder, 3D asset import, procedural examples, reusable real-time effects, animation tools and seeded world generation.
 
-> Early development: APIs may change while the project grows. The package is not published to npm yet.
+> **Version 1.0.0** — the first stable public API. GoodieGraphics.js is not published to npm yet; install it from this repository for now.
 
 ## Get the project
 
@@ -165,7 +165,7 @@ Dispose effects when removing them permanently to release GPU resources.
 - `World`: scene container, lighting and ground helper.
 - `Terrain`: seeded procedural terrain and biome palettes.
 - `DayNightCycle`: dynamic sun, ambient light, sky and fog.
-- `Models`: procedural 3D asset library.
+- `Models`: optional procedural example assets.\n- `GoodieShapes`, `Shapes`, `ModelBuilder`: general-purpose geometry and custom model construction.\n- `ModelLoader`: GLTF, GLB, OBJ and FBX asset loading.
 - `Animator`, `AnimationBuilder`, `AnimationPresets`: GoodieAnimations keyframes, playback and motion presets.
 - `Materials`: reusable material presets.
 - `ParticleEmitter`, `Water`, `Glow`: GoodieFX real-time effects.
@@ -178,7 +178,7 @@ Dispose effects when removing them permanently to release GPU resources.
 
 ## License
 
-MIT. See [LICENSE](./LICENSE).
+BSD 3-Clause. See [LICENSE](./LICENSE).
 
 ## GoodieAnimations: professional 3D motion
 
@@ -224,11 +224,11 @@ Then visit `http://localhost:5173/studio.html`. GoodieStudio is a browser-based 
 
 ### Editor features
 
-- Add the ten procedural assets from the GoodieModels library.
+- Add ten ready-made procedural assets and sixteen general-purpose geometry primitives.\n- Combine primitive shapes to start building custom models.
 - Select objects from the viewport or scene hierarchy.
 - Edit position, rotation and scale in the inspector.
 - Duplicate and delete objects.
 - Generate seeded terrain across all five GoodieWorld biomes.
 - Export a scene to a `.goodie.json` file and import it later.
 
-The scene format stores asset type, transforms, scene name and terrain settings. Imported files are validated before their contents are added. GoodieStudio is an early editor: it currently focuses on procedural assets and transforms rather than arbitrary mesh or material authoring.
+The scene format stores asset type, transforms, scene name and terrain settings. Imported files are validated before their contents are added. GoodieStudio currently focuses on scene assembly and transforms; advanced mesh sculpting and desktop editing are future work.
