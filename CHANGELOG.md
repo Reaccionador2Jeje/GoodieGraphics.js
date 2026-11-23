@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- Interactive viewport transform gizmos for moving, rotating and scaling selected objects.
+- W/E/R shortcuts for switching transform modes.
+- Unsaved-scene protection when closing the desktop editor, opening another scene or creating a new scene.
+
 ## 1.0.0 — 2026-11-23
 
 First stable public API release.
