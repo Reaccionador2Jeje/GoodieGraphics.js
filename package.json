@@ -37,6 +37,7 @@
     "CHANGELOG.md",
     "index.html",
     "studio.html",
+    "blockhaven.html",
     "vite.config.js"
   ],
   "scripts": {
