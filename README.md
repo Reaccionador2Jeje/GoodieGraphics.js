@@ -6,6 +6,13 @@ GoodieGraphics.js is a high-level 3D graphics toolkit for the web, powered by Th
 
 > **Version 1.0.0** — the first stable public API. GoodieGraphics.js is not published to npm yet; install it from this repository for now.
 
+
+## Blockhaven: Wildlands
+
+Blockhaven is an original block-building and exploration sandbox built as a playable example of the GoodieGraphics.js library. It combines seeded procedural terrain, editable voxel blocks, mobile and desktop first-person controls, a day/night cycle, animated water, procedural models, custom ModelBuilder props, particle effects, glow sprites, keyframe animation, material presets and optional GLTF/GLB/OBJ/FBX model importing.
+
+Run it locally with `npm install` and `npm run dev`, then open [http://localhost:5173/blockhaven.html](http://localhost:5173/blockhaven.html). The production build includes the game at `/blockhaven.html`. Worlds can be saved in the browser's local storage.
+
 ## Get the project
 
 ```bash
