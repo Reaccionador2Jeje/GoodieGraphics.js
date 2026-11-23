@@ -162,6 +162,8 @@ animator.crossFadeTo("Sway", { duration: 0.4 });
 animator.dispose();
 ```
 
+GLTFLoader results are supported directly with `Animator.fromGLTF(gltf)`, so imported skeletal clips can be played alongside clips built in code.
+
 ### Build custom keyframe clips
 
 ```js
