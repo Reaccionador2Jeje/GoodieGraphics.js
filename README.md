@@ -4,25 +4,13 @@
 
 GoodieGraphics.js is a high-level 3D graphics toolkit for the web, powered by Three.js. It adds a friendly API, procedural assets and reusable visual building blocks on top of a proven renderer.
 
-> Early development: APIs may change while the project grows.
+> Early development: APIs may change while the project grows. The package is not published to npm yet.
 
-## Goals
-
-- Create rich 3D experiences with a concise JavaScript API.
-- Provide ready-to-use procedural models, not only primitive shapes.
-- Offer reusable materials, effects and environment presets.
-- Support desktop and mobile browsers.
-- Keep access to the underlying Three.js scene and objects.
-
-## Install
+## Get the project
 
 ```bash
-npm install goodiegraphics.js
-```
-
-For local repository development:
-
-```bash
+git clone https://github.com/Reaccionador2Jeje/GoodieGraphics.js.git
+cd GoodieGraphics.js
 npm install
 npm run dev
 ```
@@ -30,7 +18,7 @@ npm run dev
 ## Quick start
 
 ```js
-import * as Goodie from "goodiegraphics.js";
+import * as Goodie from "./src/index.js";
 
 const game = new Goodie.Game({
   container: document.querySelector("#app"),
@@ -73,6 +61,12 @@ All models return Three.js `Group` objects, so you can position, rotate, scale a
 - `World`: scene container, lighting and ground helper.
 - `Models`: procedural 3D asset library.
 - `Materials`: reusable material presets.
+
+## Scripts
+
+- `npm run dev`: start the Vite showcase.
+- `npm run build`: create a production build.
+- `npm test`: run the Node.js test suite.
 
 ## Development
 
