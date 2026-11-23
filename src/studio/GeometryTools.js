@@ -83,6 +83,14 @@ function restoreAttribute(data) {
   return new BufferAttribute(new ArrayType(data.array), data.itemSize, Boolean(data.normalized));
 }
 
+export function serializeGeometryJSON(source) {
+  if (!source?.isBufferGeometry) throw new TypeError("Expected a Three.js BufferGeometry.");
+  const geometry = source.clone();
+  // Built-in geometries otherwise serialize constructor parameters, not edited buffers.
+  delete geometry.parameters;
+  return geometry.toJSON();
+}
+
 export function restoreGeometryJSON(json) {
   const data = json?.data;
   if (!data || typeof data.attributes !== "object") throw new TypeError("Invalid serialized BufferGeometry.");
@@ -95,7 +103,8 @@ export function restoreGeometryJSON(json) {
     geometry.morphAttributes[name] = attributes.map(restoreAttribute);
   }
   geometry.morphTargetsRelative = Boolean(data.morphTargetsRelative);
-  geometry.userData = data.userData && typeof data.userData === "object" ? structuredClone(data.userData) : {};
+  geometry.name = typeof json.name === "string" ? json.name : "";
+  geometry.userData = json.userData && typeof json.userData === "object" ? structuredClone(json.userData) : {};
   refreshGeometry(geometry);
   return geometry;
 }
