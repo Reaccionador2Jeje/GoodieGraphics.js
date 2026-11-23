@@ -2,7 +2,7 @@ import * as THREE from "three";
 import {
   Game, World, Models, GoodieShapes, ModelBuilder, ModelLoader, Materials,
   ParticleEmitter, Water, Glow, Terrain, DayNightCycle, Animator,
-  AnimationBuilder, AnimationPresets, LoopRepeat
+  AnimationBuilder, AnimationPresets, GoodieShaders, LoopRepeat
 } from "../src/index.js";
 
 const $ = (id) => document.getElementById(id);
@@ -10,14 +10,14 @@ const viewport = $("viewport");
 const BLOCK = 1;
 const WORLD_RADIUS = 13;
 const BLOCK_TYPES = {
-  grass: { label: "Hierba", material: Materials.grass({ color: "#75a95a" }) },
-  dirt: { label: "Tierra", material: Materials.wood({ color: "#96613d", roughness: 1 }) },
-  stone: { label: "Piedra", material: Materials.stone({ color: "#9299a3" }) },
-  wood: { label: "Madera", material: Materials.wood({ color: "#a66e3e" }) },
-  sand: { label: "Arena", material: Materials.grass({ color: "#d9bd78" }) },
-  crystal: { label: "Cristal", material: Materials.crystal({ color: "#69d9f2", emissive: "#1c8da9", emissiveIntensity: .42 }) }
+  grass: { label: "Hierba", material: GoodieShaders.voxel({ color: "#75a95a", roughness: 1, grain: .045, topLight: .17 }) },
+  dirt: { label: "Tierra", material: GoodieShaders.voxel({ color: "#96613d", roughness: 1, grain: .075, topLight: .08 }) },
+  stone: { label: "Piedra", material: GoodieShaders.voxel({ color: "#9299a3", roughness: .96, grain: .055, edgeLight: .035 }) },
+  wood: { label: "Madera", material: GoodieShaders.voxel({ color: "#a66e3e", roughness: .88, grain: .065, topLight: .1 }) },
+  sand: { label: "Arena", material: GoodieShaders.voxel({ color: "#d9bd78", roughness: 1, grain: .09, topLight: .14 }) },
+  crystal: { label: "Cristal", material: GoodieShaders.voxel({ color: "#69d9f2", roughness: .16, metalness: .12, emissive: "#1c8da9", emissiveIntensity: .42, grain: .018, topLight: .22, edgeLight: .15, transparent: true, opacity: .94 }) }
 };
-const blockGeometry = GoodieShapes.box({ width: BLOCK, height: BLOCK, depth: BLOCK }).geometry;
+const blockGeometry = GoodieShapes.box({ width: BLOCK, height: BLOCK, depth: BLOCK, bevel: 0.025 }).geometry;
 const blockMap = new Map();
 const blockMeshes = [];
 const animators = [];
@@ -48,8 +48,13 @@ const game = new Game({
   camera: { fov: 74, near: .08, far: 180, position: [0, 3, 7] }
 });
 const world = new World({ background: "#a9d5ee", fog: { color: "#a9d5ee", near: 25, far: 92 } });
+world.ambientLight.intensity = 1.25;
+world.sun.intensity = 2.6;
 world.sun.position.set(22, 32, 12);
-world.sun.shadow.mapSize.set(1024, 1024);
+world.sun.shadow.mapSize.set(2048, 2048);
+world.sun.shadow.bias = -0.00018;
+world.sun.shadow.normalBias = 0.025;
+world.sun.shadow.radius = 3;
 world.sun.shadow.camera.left = -24;
 world.sun.shadow.camera.right = 24;
 world.sun.shadow.camera.top = 24;
