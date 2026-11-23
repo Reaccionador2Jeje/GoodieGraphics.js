@@ -6,6 +6,8 @@ export class DayNightCycle {
     if (!world?.scene?.isScene || !world.sun || !world.ambientLight) {
       throw new TypeError("DayNightCycle expects a GoodieGraphics World.");
     }
+    if (!Number.isFinite(duration) || duration <= 0 || !Number.isFinite(startAt)) throw new RangeError("Day/night duration must be positive and startAt must be finite.");
+    if (!Number.isFinite(dayIntensity) || !Number.isFinite(nightIntensity) || dayIntensity < 0 || nightIntensity < 0) throw new RangeError("Light intensities must be non-negative finite numbers.");
     this.world = world;
     this.duration = Math.max(10, duration);
     this.time = THREE.MathUtils.euclideanModulo(startAt, 1);
