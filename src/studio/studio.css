@@ -8,3 +8,15 @@
 .desktop-indicator{display:none;color:#9eb0c2;font:9px 'DM Mono',monospace;letter-spacing:1.2px;padding:5px 7px;border:1px solid #354454;border-radius:6px}.desktop-app .desktop-indicator{display:inline-flex;align-items:center}@media(max-width:760px){.desktop-indicator{display:none}}
 
 .material-grid{display:grid;gap:10px;margin-top:8px}.material-control{display:grid;grid-template-columns:82px minmax(0,1fr);align-items:center;gap:8px;color:#aab5c2;font-size:10px}.material-control input{width:100%;min-width:0;accent-color:var(--accent)}.material-control input[type=color]{height:28px;padding:2px;border:1px solid #344151;border-radius:6px;background:#111923}.material-control input[type=range]{margin:0}.material-toggle{display:flex;align-items:center;gap:8px;color:#aab5c2;font-size:10px}.material-toggle input{accent-color:var(--accent)}
+
+/* Hierarchy tree controls */
+.hierarchy-row{display:flex;align-items:center;gap:3px;min-width:0;border-radius:7px}
+.hierarchy-row.selected{background:#3a3026}
+.hierarchy-row .object-row{flex:1;min-width:0;padding-top:7px;padding-bottom:7px}
+.hierarchy-row .tree-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hierarchy-row .tree-icon{flex:0 0 18px}
+.hierarchy-actions{display:flex;gap:2px;padding-right:4px}
+.hierarchy-actions button{width:25px;height:25px;border:1px solid transparent;border-radius:6px;background:transparent;color:#9aa8b8;cursor:pointer;font-size:12px}
+.hierarchy-actions button:hover{background:#344151;color:#fff;border-color:#526276}
+.hierarchy-quick{margin-top:7px}
+.material-control input[type=text]{min-width:0;width:100%;background:#111923;border:1px solid #344151;color:#e8eef5;border-radius:6px;padding:7px;font:10px "DM Sans",sans-serif}
