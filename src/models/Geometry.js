@@ -104,7 +104,12 @@ export class GoodieShapes {
   static wireframe({ geometry, color = "#b8d8ff", ...o } = {}) {
     if (!geometry?.isBufferGeometry) throw new TypeError("wireframe() expects a BufferGeometry.");
     const edges = new THREE.EdgesGeometry(geometry);
-    return mesh(edges, { ...o, material: new THREE.LineBasicMaterial({ color }) });
+    const lines = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color }));
+    lines.name = o.name ?? "GoodieWireframe";
+    if (o.position) lines.position.set(...o.position);
+    if (o.rotation) lines.rotation.set(...o.rotation);
+    if (o.scale) lines.scale.set(...o.scale);
+    return lines;
   }
   static fromGeometry(geometry, options = {}) {
     if (!geometry?.isBufferGeometry) throw new TypeError("fromGeometry() expects a BufferGeometry.");
