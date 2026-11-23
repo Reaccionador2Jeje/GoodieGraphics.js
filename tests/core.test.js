@@ -154,3 +154,12 @@ test("GoodieAnimations presets create named clips and validate tracks", () => {
   assert.throws(() => new AnimationBuilder(model).addVector3(model, "position", [0, 0], [0, 1], {}), /values must contain/);
   assert.throws(() => new Animator(model).play("missing"), /was not found/);
 });
+
+test("Animator can consume GLTF-style animation collections", () => {
+  const model = Models.tree();
+  const clip = AnimationPresets.idle(model);
+  const animator = Animator.fromGLTF({ scene: model, animations: [clip] });
+  assert.equal(animator.play("Idle").isRunning(), true);
+  animator.dispose();
+  assert.throws(() => Animator.fromGLTF({ scene: model, animations: [] , bad: true }, { root: null }), /GLTF result/);
+});
