@@ -23,7 +23,9 @@ export class Animator {
 
   add(clip) {
     if (this.disposed) throw new Error("This Animator has been disposed.");
-    if (!clip?.isAnimationClip) throw new TypeError("Animator.add() expects a Three.js AnimationClip.");
+    if (!(clip instanceof THREE.AnimationClip) && clip?.isAnimationClip !== true) {
+      throw new TypeError("Animator.add() expects a Three.js AnimationClip.");
+    }
     if (this.clips.has(clip.name)) throw new Error('An animation named "' + clip.name + '" already exists.');
     this.clips.set(clip.name, clip);
     this.actions.set(clip.name, this.mixer.clipAction(clip));
