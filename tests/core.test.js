@@ -140,10 +140,17 @@ test("GoodieAnimations presets create named clips and validate tracks", () => {
   const spin = AnimationPresets.spin(model, { turns: 2 });
   const pulse = AnimationPresets.pulse(model);
   const sway = AnimationPresets.sway(model);
+  const child = new (model.constructor)();
+  child.name = "AnimatedPart";
+  model.add(child);
+  const quaternionClip = new AnimationBuilder(model, { name: "TurnPart", duration: 1 })
+    .addQuaternion(child, [0, 1], [0, 0, 0, 1, 0, 1, 0, 0])
+    .build();
   assert.equal(idle.name, "Idle");
   assert.equal(spin.name, "Spin");
   assert.equal(pulse.name, "Pulse");
   assert.equal(sway.name, "Sway");
+  assert.equal(quaternionClip.tracks[0].ValueTypeName, "quaternion");
   assert.throws(() => new AnimationBuilder(model).addVector3(model, "position", [0, 0], [0, 1], {}), /values must contain/);
   assert.throws(() => new Animator(model).play("missing"), /was not found/);
 });
