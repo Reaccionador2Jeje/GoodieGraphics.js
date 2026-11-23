@@ -248,6 +248,9 @@ Then visit `http://localhost:5173/studio.html`. GoodieStudio is a browser-based 
 - Edit mesh base color, roughness, metalness, opacity and wireframe from the material inspector.
 - Switch between move, rotate and scale modes with toolbar buttons or W/E/R keyboard shortcuts.
 - Duplicate and delete objects.
+- Organize the scene with real nested groups; Group all root objects and ungroup a selected group.
+- Rename objects in the inspector, toggle visibility, and lock/unlock transforms from the hierarchy or inspector.
+- Preserve nested groups, visibility and lock state when exporting and importing `.goodie.json` scenes.
 - Generate seeded terrain across all five GoodieWorld biomes.
 - Export a scene to a `.goodie.json` file and import it later.
 
