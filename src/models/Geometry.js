@@ -90,7 +90,9 @@ export class GoodieShapes {
     return mesh(new THREE.TubeGeometry(curve, tubularSegments, radius, radialSegments, closed), o);
   }
   static extrude({ shape, depth = 0.25, bevelEnabled = true, bevelThickness = 0.08, bevelSize = 0.05, bevelSegments = 2, ...o } = {}) {
-    if (!shape?.isShape) throw new TypeError("extrude() expects a THREE.Shape.");
+    if (!(shape instanceof THREE.Shape) && !(shape?.isShape === true)) {
+      throw new TypeError("extrude() expects a THREE.Shape created by GoodieShapes.shape() or THREE.Shape.");
+    }
     return mesh(new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled, bevelThickness, bevelSize, bevelSegments, curveSegments: 12 }), o);
   }
   static shape({ points, ...o } = {}) {
