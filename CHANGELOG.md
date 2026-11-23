@@ -3,6 +3,8 @@
 ## Unreleased
 
 ### Added
+- Geometry inspector tools for centering pivots, recalculating normals and mirroring mesh geometry on any axis.
+- Geometry statistics and non-destructive buffer cloning, with edited geometry and local mesh transforms persisted in `.goodie.json` scenes.
 - Nested scene groups with Group all and Ungroup actions, plus recursive scene serialization and restoration.
 - Object renaming, visibility toggles and transform locking in the hierarchy and inspector.
 - Interactive viewport transform gizmos for moving, rotating and scaling selected objects.
