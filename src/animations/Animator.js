@@ -13,6 +13,14 @@ export class Animator {
     for (const clip of clips) this.add(clip);
   }
 
+  /** Create an Animator directly from a GLTFLoader result. */
+  static fromGLTF(gltf, { root = gltf?.scene } = {}) {
+    if (!gltf || !root?.isObject3D || !Array.isArray(gltf.animations)) {
+      throw new TypeError("Animator.fromGLTF() expects a GLTF result with a scene and animations.");
+    }
+    return new Animator(root, { clips: gltf.animations });
+  }
+
   add(clip) {
     if (this.disposed) throw new Error("This Animator has been disposed.");
     if (!clip?.isAnimationClip) throw new TypeError("Animator.add() expects a Three.js AnimationClip.");
