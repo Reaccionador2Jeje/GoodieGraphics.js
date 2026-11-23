@@ -17,10 +17,15 @@ export class ParticleEmitter {
     loop = true,
     position = [0, 0, 0]
   } = {}) {
-    this.count = Math.max(1, Math.floor(count));
+    if (!Number.isFinite(count) || count < 1 || count > 100000) throw new RangeError("Particle count must be between 1 and 100000.");
+    if (!Number.isFinite(lifetime) || lifetime <= 0) throw new RangeError("Particle lifetime must be positive.");
+    if (!Number.isFinite(speed) || speed < 0 || !Number.isFinite(spread) || spread < 0) throw new RangeError("Particle speed and spread must be non-negative finite numbers.");
+    if (!Number.isFinite(gravity) || !Number.isFinite(size) || size <= 0 || !Number.isFinite(opacity) || opacity < 0 || opacity > 1) throw new RangeError("Particle gravity must be finite, size positive and opacity between 0 and 1.");
+    if (!Array.isArray(position) || position.length !== 3 || position.some((value) => !Number.isFinite(value))) throw new TypeError("Particle position must be a finite [x, y, z] tuple.");
+    this.count = Math.floor(count);
     this.lifetime = Math.max(0.05, lifetime);
-    this.speed = Math.max(0, speed);
-    this.spread = Math.max(0, spread);
+    this.speed = speed;
+    this.spread = spread;
     this.gravity = gravity;
     this.loop = loop;
     this.enabled = true;
@@ -46,7 +51,6 @@ export class ParticleEmitter {
   _spawn(index) {
     const i = index * 3;
     const angle = Math.random() * Math.PI * 2;
-    const radial = Math.sqrt(Math.random()) * this.spread;
     this._positions[i] = (Math.random() - 0.5) * this.spread;
     this._positions[i + 1] = 0;
     this._positions[i + 2] = (Math.random() - 0.5) * this.spread;
