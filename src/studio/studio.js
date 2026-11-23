@@ -5,7 +5,7 @@ import { TransformControls } from "three/addons/controls/TransformControls.js";
 import { Models } from "../models/Models.js";
 import { GoodieShapes } from "../models/Geometry.js";
 import { Terrain } from "../world/Terrain.js";
-import { editGeometry, inspectGeometry, restoreGeometryJSON } from "./GeometryTools.js";
+import { editGeometry, inspectGeometry, restoreGeometryJSON, serializeGeometryJSON } from "./GeometryTools.js";
 
 const $ = (id) => document.getElementById(id);
 document.documentElement.classList.toggle("desktop-app", Boolean(window.goodieDesktop?.isDesktop));
@@ -537,7 +537,7 @@ function serializeObject(object) {
     const visit = (node, path) => {
       if (node !== object && (node.userData?.goodieType || node.userData?.goodieGroup)) return;
       if (node.isMesh && node.userData.goodieGeometryEdited) {
-        overrides.push({ path, geometry: node.geometry.toJSON(), position: node.position.toArray(), rotation: [node.rotation.x, node.rotation.y, node.rotation.z], scale: node.scale.toArray() });
+        overrides.push({ path, geometry: serializeGeometryJSON(node.geometry), position: node.position.toArray(), rotation: [node.rotation.x, node.rotation.y, node.rotation.z], scale: node.scale.toArray() });
       }
       node.children.forEach((child, index) => visit(child, [...path, index]));
     };
