@@ -186,13 +186,13 @@ function applyMaterialSettings(settings, root = selected, dirty = true) {
   if (!materials.length) return;
   for (const material of materials) {
     if (material.color && settings.color) material.color.set(settings.color);
-    if ("roughness" in material) material.roughness = THREE.MathUtils.clamp(Number(settings.roughness), 0, 1);
-    if ("metalness" in material) material.metalness = THREE.MathUtils.clamp(Number(settings.metalness), 0, 1);
-    if ("opacity" in material) {
+    if ("roughness" in material && settings.roughness !== undefined) material.roughness = THREE.MathUtils.clamp(Number(settings.roughness), 0, 1);
+    if ("metalness" in material && settings.metalness !== undefined) material.metalness = THREE.MathUtils.clamp(Number(settings.metalness), 0, 1);
+    if ("opacity" in material && settings.opacity !== undefined) {
       material.opacity = THREE.MathUtils.clamp(Number(settings.opacity), 0, 1);
       material.transparent = material.opacity < 1;
     }
-    if ("wireframe" in material) material.wireframe = Boolean(settings.wireframe);
+    if ("wireframe" in material && settings.wireframe !== undefined) material.wireframe = Boolean(settings.wireframe);
     material.needsUpdate = true;
   }
   if (dirty) markChanged();
