@@ -2,7 +2,7 @@ import * as THREE from "three";
 import {
   Game, World, Models, GoodieShapes, ModelBuilder, ModelLoader, Materials,
   ParticleEmitter, Water, Glow, Terrain, DayNightCycle, Animator,
-  AnimationBuilder, AnimationPresets, LoopRepeat
+  AnimationBuilder, AnimationPresets, LoopRepeat, GoodieShaders
 } from "../src/index.js";
 
 function showFatalError(error) {
@@ -27,11 +27,11 @@ const viewport = $("viewport");
 const BLOCK = 1;
 const WORLD_RADIUS = 13;
 const BLOCK_TYPES = {
-  grass: { label: "Hierba", material: new THREE.MeshStandardMaterial({ color: "#75a95a", roughness: 1 }) },
-  dirt: { label: "Tierra", material: new THREE.MeshStandardMaterial({ color: "#96613d", roughness: 1 }) },
-  stone: { label: "Piedra", material: new THREE.MeshStandardMaterial({ color: "#9299a3", roughness: .96 }) },
-  wood: { label: "Madera", material: new THREE.MeshStandardMaterial({ color: "#a66e3e", roughness: .88 }) },
-  sand: { label: "Arena", material: new THREE.MeshStandardMaterial({ color: "#d9bd78", roughness: 1 }) },
+  grass: { label: "Hierba", material: GoodieShaders.voxel({ color: "#75a95a", roughness: 1, grain: .055, topLight: .19, edgeLight: .035 }) },
+  dirt: { label: "Tierra", material: GoodieShaders.voxel({ color: "#96613d", roughness: 1, grain: .085, topLight: .10, edgeLight: .025 }) },
+  stone: { label: "Piedra", material: GoodieShaders.voxel({ color: "#9299a3", roughness: .96, grain: .065, topLight: .14, edgeLight: .045 }) },
+  wood: { label: "Madera", material: GoodieShaders.voxel({ color: "#a66e3e", roughness: .88, grain: .045, topLight: .13, edgeLight: .04 }) },
+  sand: { label: "Arena", material: GoodieShaders.voxel({ color: "#d9bd78", roughness: 1, grain: .075, topLight: .16, edgeLight: .025 }) },
   crystal: { label: "Cristal", material: new THREE.MeshPhysicalMaterial({ color: "#69d9f2", roughness: .16, metalness: .12, emissive: "#1c8da9", emissiveIntensity: .42, transparent: true, opacity: .94, transmission: .12 }) }
 };
 const blockGeometry = GoodieShapes.box({ width: BLOCK, height: BLOCK, depth: BLOCK }).geometry;
