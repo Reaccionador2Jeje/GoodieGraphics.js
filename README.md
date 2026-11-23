@@ -251,3 +251,6 @@ Then visit `http://localhost:5173/studio.html`. GoodieStudio is a browser-based 
 - Export a scene to a `.goodie.json` file and import it later.
 
 The scene format stores asset type, transforms, scene name and terrain settings. Imported files are validated before their contents are added. GoodieStudio currently focuses on scene assembly and transforms; advanced mesh sculpting is future work.
+
+
+GoodieStudio's inspector also supports per-object material editing (base color, roughness, metalness, opacity and wireframe), with settings saved in scene exports.
