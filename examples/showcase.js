@@ -39,10 +39,33 @@ for (const [object, x, z] of props) {
   world.add(object);
 }
 
+// A small pond with a soft magical glow and floating particles.
+const pond = new Goodie.Water({ width: 8, height: 5, color: "#35bde8", opacity: 0.88 });
+pond.mesh.position.set(0, 0.035, -10);
+world.add(pond.mesh);
+
+const sparkle = new Goodie.ParticleEmitter({
+  count: 90, color: "#c7f5ff", size: 0.11,
+  lifetime: 2.4, speed: 0.8, spread: 3,
+  gravity: 0.12, position: [0, 0.4, -10]
+});
+world.add(sparkle.points);
+
+const crystalGlow = new Goodie.Glow({
+  color: "#8be9ff", size: 2.4, opacity: 0.55,
+  position: [-3, 1.8, 1]
+});
+world.add(crystalGlow.sprite);
+
 game.setWorld(world);
 game.onUpdate((delta) => {
   for (const object of world.objects) {
     if (object.name === "GoodieCrystal") object.rotation.y += delta * 0.7;
   }
+  pond.update(delta);
+  sparkle.update(delta);
 });
 game.start();
+
+// Keep references available for future scene controls and clean-up.
+window.goodieDemo = { game, world, pond, sparkle, crystalGlow };
