@@ -42,6 +42,11 @@ export class Terrain {
     color = null
   } = {}) {
     if (!BIOMES[biome]) throw new RangeError(`Unknown biome "${biome}". Choose: ${Object.keys(BIOMES).join(", ")}.`);
+    if (![width, depth].every((value) => Number.isFinite(value) && value > 0)) throw new RangeError("Terrain width and depth must be positive finite numbers.");
+    if (!Number.isFinite(segments) || segments < 2 || segments > 512) throw new RangeError("Terrain segments must be between 2 and 512.");
+    if (!Number.isFinite(seed) || !Number.isFinite(amplitude) || amplitude < 0 || !Number.isFinite(frequency) || frequency <= 0) {
+      throw new RangeError("Terrain seed must be finite, amplitude non-negative and frequency positive.");
+    }
     this.width = width;
     this.depth = depth;
     this.seed = seed;
@@ -51,7 +56,7 @@ export class Terrain {
     this.palette = BIOMES[biome];
     if (color) this.palette = { ...this.palette, middle: color };
 
-    const columns = Math.max(2, Math.floor(segments));
+    const columns = Math.floor(segments);
     const rows = Math.max(2, Math.floor(segments * depth / width));
     const positions = [];
     const colors = [];
@@ -105,6 +110,7 @@ export class Terrain {
 
   /** Approximate terrain elevation at world-space x/z coordinates. */
   getHeightAt(x, z) {
+    if (!Number.isFinite(x) || !Number.isFinite(z)) throw new TypeError("Terrain coordinates must be finite numbers.");
     const n = terrainNoise(x * this.frequency, z * this.frequency, this.seed);
     const edge = Math.min(1, Math.min((0.5 - Math.abs(x / this.width)) * 7, (0.5 - Math.abs(z / this.depth)) * 7));
     return n * this.amplitude * Math.max(0.12, edge);
