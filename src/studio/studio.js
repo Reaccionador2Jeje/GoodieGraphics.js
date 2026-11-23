@@ -250,6 +250,13 @@ function renderInspector() {
   title.className = "inspector-name";
   title.textContent = (icons[selected.userData.goodieType?.replace(/^shape:/, "")] || "🗂️") + "  " + selected.name;
   panel.appendChild(title);
+  if (selectedObjects.size > 1) {
+    const note = document.createElement("p");
+    note.className = "hint";
+    note.textContent = selectedObjects.size + " objects selected. Group them to transform and organize them together.";
+    panel.appendChild(note);
+    return;
+  }
   panel.appendChild(inspectorHeading("OBJECT"));
   const nameField = materialControl("Name", "text", selected.name, value => { selected.name = value.trim() || "Object"; $("selectionToast").textContent = selected.name; renderHierarchy(); markChanged(); });
   nameField.querySelector("input").maxLength = 80; panel.appendChild(nameField);
