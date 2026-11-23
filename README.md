@@ -2,7 +2,7 @@
 
 **Make the Web 3D Delicious.**
 
-GoodieGraphics.js is a high-level 3D graphics toolkit for the web, powered by Three.js. It provides a general-purpose geometry library, a custom model builder, 3D asset import, procedural examples, reusable real-time effects, animation tools and seeded world generation.
+GoodieGraphics.js is a high-level 3D graphics toolkit for the web, powered by Three.js. GoodieStudio is available in the browser and as a cross-platform desktop application powered by Electron. It provides a general-purpose geometry library, a custom model builder, 3D asset import, procedural examples, reusable real-time effects, animation tools and seeded world generation.
 
 > **Version 1.0.0** — the first stable public API. GoodieGraphics.js is not published to npm yet; install it from this repository for now.
 
@@ -178,6 +178,21 @@ Dispose effects when removing them permanently to release GPU resources.
 - `npm run build`: create a production build.
 - `npm test`: run the Node.js test suite.
 
+## GoodieStudio Desktop
+
+GoodieStudio Desktop packages the existing 3D editor in a native application window. It includes native Open/Export dialogs, a File menu with keyboard shortcuts, and builds for Windows, macOS and Linux. The renderer uses context isolation and has Node.js integration disabled; file operations go through a restricted preload bridge.
+
+```bash
+npm install
+npm run desktop:dev       # Run the desktop app during development
+npm run desktop:build     # Build for the current operating system
+npm run desktop:win       # Windows installer (NSIS)
+npm run desktop:linux     # Linux AppImage + deb
+npm run desktop:mac       # macOS disk image
+```
+
+Build artifacts are written to `release/`. Platform signing and final packaging should be performed on the target operating system.
+
 ## License
 
 BSD 3-Clause. See [LICENSE](./LICENSE).
@@ -234,4 +249,4 @@ Then visit `http://localhost:5173/studio.html`. GoodieStudio is a browser-based 
 - Generate seeded terrain across all five GoodieWorld biomes.
 - Export a scene to a `.goodie.json` file and import it later.
 
-The scene format stores asset type, transforms, scene name and terrain settings. Imported files are validated before their contents are added. GoodieStudio currently focuses on scene assembly and transforms; advanced mesh sculpting and desktop editing are future work.
+The scene format stores asset type, transforms, scene name and terrain settings. Imported files are validated before their contents are added. GoodieStudio currently focuses on scene assembly and transforms; advanced mesh sculpting is future work.
