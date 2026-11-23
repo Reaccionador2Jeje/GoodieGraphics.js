@@ -17,7 +17,7 @@ const BLOCK_TYPES = {
   sand: { label: "Arena", material: GoodieShaders.voxel({ color: "#d9bd78", roughness: 1, grain: .09, topLight: .14 }) },
   crystal: { label: "Cristal", material: GoodieShaders.voxel({ color: "#69d9f2", roughness: .16, metalness: .12, emissive: "#1c8da9", emissiveIntensity: .42, grain: .018, topLight: .22, edgeLight: .15, transparent: true, opacity: .94 }) }
 };
-const blockGeometry = GoodieShapes.box({ width: BLOCK, height: BLOCK, depth: BLOCK, bevel: 0.025 }).geometry;
+const blockGeometry = GoodieShapes.box({ width: BLOCK, height: BLOCK, depth: BLOCK }).geometry;
 const blockMap = new Map();
 const blockMeshes = [];
 const animators = [];
