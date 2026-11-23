@@ -1,0 +1,26 @@
+{
+  "name": "goodiegraphics.js",
+  "version": "0.1.0",
+  "description": "A deliciously simple 3D graphics toolkit for the web, powered by Three.js.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": ["3d", "threejs", "graphics", "webgl", "game-development"],
+  "main": "./src/index.js",
+  "module": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./*": "./src/*"
+  },
+  "files": ["src", "README.md", "LICENSE"],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "vite": "^7.1.0"
+  }
+}
