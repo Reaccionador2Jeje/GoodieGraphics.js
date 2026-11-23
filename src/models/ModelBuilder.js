@@ -58,15 +58,18 @@ export class ModelBuilder {
   static from(object, { clone = true, name = "GoodieImportedModel" } = {}) {
     if (!object?.isObject3D) throw new TypeError("ModelBuilder.from() expects an Object3D.");
     const builder = new ModelBuilder({ name });
-    builder.root.position.copy(object.position);
-    builder.root.quaternion.copy(object.quaternion);
-    builder.root.scale.copy(object.scale);
+    if (object.children.length) {
+      builder.root.position.copy(object.position);
+      builder.root.quaternion.copy(object.quaternion);
+      builder.root.scale.copy(object.scale);
 
-    // Import the source root's direct children so the resulting builder keeps
-    // the same top-level scene graph instead of adding an extra wrapper level.
-    const children = object.children.length ? [...object.children] : [object];
-    for (const child of children) {
-      builder.root.add(clone ? child.clone(true) : child);
+      // Import direct children to preserve the original top-level hierarchy.
+      for (const child of object.children) {
+        builder.root.add(clone ? child.clone(true) : child);
+      }
+    } else {
+      // A leaf object keeps its own transform inside the imported root.
+      builder.root.add(clone ? object.clone(true) : object);
     }
     return builder;
   }
