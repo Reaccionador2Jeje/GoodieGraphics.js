@@ -72,6 +72,44 @@ dayNight.resume();
 
 The cycle updates sunlight, hemisphere lighting, sky background and fog color.
 
+## Create any 3D model: GoodieShapes + ModelBuilder
+
+The ten `Models.*` assets are optional ready-made examples. Build original objects from geometry primitives, custom extrusions, lathed profiles, tubes, polyhedra and imported assets.
+
+### Geometry library
+
+`GoodieShapes` includes: `box`, `plane`, `circle`, `ring`, `sphere`, `ellipsoid`, `capsule`, `cylinder`, `cone`, `pyramid`, `torus`, `torusKnot`, `dodecahedron`, `icosahedron`, `octahedron`, `tetrahedron`, `polyhedron`, `lathe`, `tube`, `extrude`, `shape`, `wireframe` and `fromGeometry`.
+
+```js
+const body = Goodie.GoodieShapes.box({ width: 2, height: 3, depth: 1, color: "#55aaff" });
+const detail = Goodie.GoodieShapes.torus({ radius: 0.6, tube: 0.12, color: "#ffcc55" });
+```
+
+### Assemble a completely custom model
+
+```js
+const builder = new Goodie.ModelBuilder({ name: "MyRobot" });
+builder.box({ width: 1.2, height: 1.5, depth: 0.8, color: "#718096" }, { name: "Body", position: [0, 1.5, 0] });
+builder.sphere({ radius: 0.65, color: "#9bdcff" }, { name: "Head", position: [0, 2.7, 0] });
+builder.cylinder({ radiusTop: 0.12, radiusBottom: 0.16, height: 1.1, color: "#303846" }, { position: [-0.8, 0.5, 0] });
+builder.torus({ radius: 0.3, tube: 0.08, color: "#ffcc55" }, { position: [0, 1.7, 0.5] });
+const robot = builder.build();
+world.add(robot);
+```
+
+### Import existing 3D assets
+
+```js
+const gltf = await Goodie.ModelLoader.gltf("/models/character.glb");
+world.add(gltf.scene);
+const animator = Goodie.Animator.fromGLTF(gltf);
+if (gltf.animations.length) animator.play(gltf.animations[0].name);
+
+const obj = await Goodie.ModelLoader.obj("/models/prop.obj");
+world.add(obj);
+```
+
+Supported import formats: glTF, GLB, OBJ and FBX. Loading remote files requires the host to permit the request (CORS).
 ## Procedural model library
 
 | Model | Description |
