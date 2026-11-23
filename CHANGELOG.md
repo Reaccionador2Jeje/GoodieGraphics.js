@@ -3,6 +3,8 @@
 ## Unreleased
 
 ### Added
+- Nested scene groups with Group all and Ungroup actions, plus recursive scene serialization and restoration.
+- Object renaming, visibility toggles and transform locking in the hierarchy and inspector.
 - Interactive viewport transform gizmos for moving, rotating and scaling selected objects.
 - W/E/R shortcuts for switching transform modes.
 - Unsaved-scene protection when closing the desktop editor, opening another scene or creating a new scene.
