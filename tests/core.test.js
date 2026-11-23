@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { Models, World, Materials, ParticleEmitter, Water, Terrain, DayNightCycle, Animator, AnimationBuilder, AnimationPresets, version, LoopOnce } from "../src/index.js";
+import { Models, World, Materials, ParticleEmitter, Water, Terrain, DayNightCycle, Animator, AnimationBuilder, AnimationPresets, GoodieShapes, Shapes, ModelBuilder, ModelLoader, version, LoopOnce } from "../src/index.js";
 
 test("exports the public API", () => {
   assert.equal(version, "0.4.0");
@@ -162,4 +162,32 @@ test("Animator can consume GLTF-style animation collections", () => {
   assert.equal(animator.play("Idle").isRunning(), true);
   animator.dispose();
   assert.throws(() => Animator.fromGLTF({ scene: model, animations: [] , bad: true }, { root: null }), /GLTF result/);
+});
+
+test("GoodieShapes creates many generic editable geometries", () => {
+  const factories = ["box", "plane", "circle", "ring", "sphere", "ellipsoid", "capsule", "cylinder", "cone", "pyramid", "torus", "torusKnot", "dodecahedron", "icosahedron", "octahedron", "tetrahedron"];
+  for (const name of factories) {
+    const object = GoodieShapes[name]();
+    assert.equal(object.isMesh, true, name + " should return a Mesh");
+    assert.equal(object.geometry.isBufferGeometry, true);
+  }
+  assert.equal(Shapes, GoodieShapes);
+  assert.equal(GoodieShapes.lathe({ points: [[0.2, 0], [0.5, 1], [0.2, 2]] }).isMesh, true);
+  assert.equal(GoodieShapes.tube({ points: [[0, 0, 0], [1, 1, 0], [2, 0, 0]] }).isMesh, true);
+  assert.equal(GoodieShapes.extrude({ shape: GoodieShapes.shape({ points: [[0, 0], [1, 0], [0.5, 1]] }) }).isMesh, true);
+  assert.throws(() => GoodieShapes.shape({ points: [[0, 0], [1, 0]] }), /three/);
+});
+
+test("ModelBuilder assembles arbitrary meshes and nested groups", () => {
+  const builder = new ModelBuilder({ name: "TestCustomModel" });
+  const body = builder.box({ color: "#ff0000" }, { name: "Body", position: [0, 1, 0] });
+  const headGroup = builder.group("Head", { position: [0, 2, 0] });
+  builder.add(GoodieShapes.sphere({ radius: 0.5 }), { name: "HeadMesh", parent: headGroup });
+  const model = builder.build();
+  assert.equal(model.name, "TestCustomModel");
+  assert.equal(model.getObjectByName("Body"), body);
+  assert.ok(model.getObjectByName("HeadMesh"));
+  assert.throws(() => builder.add(new (body.constructor)(), { parent: new (body.constructor)() }), /Parent/);
+  assert.equal(ModelBuilder.from(model).build().children.length, model.children.length);
+  assert.equal(typeof ModelLoader.gltf, "function");
 });
