@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
+import { BufferGeometryLoader } from "three/addons/loaders/BufferGeometryLoader.js";
 import { Models } from "../models/Models.js";
 import { GoodieShapes } from "../models/Geometry.js";
 import { Terrain } from "../world/Terrain.js";
@@ -524,7 +525,19 @@ renderer.domElement.addEventListener("pointerup", (event) => {
 
 function serializeObject(object) {
   const data = { type: object.userData.goodieGroup ? "group" : object.userData.goodieType, name: object.name, position: object.position.toArray(), rotation: [object.rotation.x, object.rotation.y, object.rotation.z], scale: object.scale.toArray(), visible: object.visible, locked: Boolean(object.userData.locked) };
-  if (!object.userData.goodieGroup) data.material = readMaterialSettings(object);
+  if (!object.userData.goodieGroup) {
+    data.material = readMaterialSettings(object);
+    const overrides = [];
+    const visit = (node, path) => {
+      if (node !== object && (node.userData?.goodieType || node.userData?.goodieGroup)) return;
+      if (node.isMesh && node.userData.goodieGeometryEdited) {
+        overrides.push({ path, geometry: node.geometry.toJSON(), position: node.position.toArray(), rotation: [node.rotation.x, node.rotation.y, node.rotation.z], scale: node.scale.toArray() });
+      }
+      node.children.forEach((child, index) => visit(child, [...path, index]));
+    };
+    visit(object, []);
+    if (overrides.length) data.geometryOverrides = overrides;
+  }
   const children = object.children.filter(child => child.userData?.goodieType || child.userData?.goodieGroup);
   if (children.length) data.children = children.map(serializeObject);
   return data;
@@ -578,6 +591,30 @@ async function importSceneText(text) {
     if (item.material && typeof item.material === "object" && !object.userData.goodieGroup) {
       const material = item.material;
       applyMaterialSettings({ color: /^#[0-9a-f]{6}$/i.test(material.color) ? material.color : "#ffffff", roughness: Number.isFinite(Number(material.roughness)) ? THREE.MathUtils.clamp(Number(material.roughness),0,1) : 0.7, metalness: Number.isFinite(Number(material.metalness)) ? THREE.MathUtils.clamp(Number(material.metalness),0,1) : 0, opacity: Number.isFinite(Number(material.opacity)) ? THREE.MathUtils.clamp(Number(material.opacity),0,1) : 1, wireframe: Boolean(material.wireframe) }, object, false);
+    }
+    if (Array.isArray(item.geometryOverrides) && !object.userData.goodieGroup) {
+      const loader = new BufferGeometryLoader();
+      for (const override of item.geometryOverrides) {
+        if (!Array.isArray(override?.path) || !override.geometry) continue;
+        let target = object;
+        let validPath = true;
+        for (const index of override.path) {
+          if (!Number.isInteger(index) || index < 0 || !target.children[index]) { validPath = false; break; }
+          target = target.children[index];
+        }
+        if (!validPath || !target.isMesh) continue;
+        try {
+          const geometry = loader.parse(override.geometry);
+          target.geometry.dispose();
+          target.geometry = geometry;
+          target.userData.goodieGeometryEdited = true;
+          if (Array.isArray(override.position) && override.position.length === 3) target.position.fromArray(override.position);
+          if (Array.isArray(override.rotation) && override.rotation.length === 3) target.rotation.set(...override.rotation);
+          if (Array.isArray(override.scale) && override.scale.length === 3) target.scale.fromArray(override.scale);
+        } catch (error) {
+          console.warn("Skipping invalid geometry override:", error);
+        }
+      }
     }
     if (Array.isArray(item.children)) item.children.forEach(child => restoreObject(child, object));
     return object;
