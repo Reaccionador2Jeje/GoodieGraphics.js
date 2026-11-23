@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as THREE from "three";
-import { editGeometry, inspectGeometry, restoreGeometryJSON } from "../src/studio/GeometryTools.js";
+import { editGeometry, inspectGeometry, restoreGeometryJSON, serializeGeometryJSON } from "../src/studio/GeometryTools.js";
 
 function close(actual, expected, epsilon = 1e-6) {
   assert.ok(Math.abs(actual - expected) <= epsilon, `Expected ${actual} to be close to ${expected}`);
@@ -69,7 +69,7 @@ test("serialized edited geometry can be restored with its attributes and groups"
   const original = new THREE.BoxGeometry(2, 3, 4, 2, 2, 2);
   original.addGroup(0, 6, 0);
   original.translate(1, 2, 3);
-  const restored = restoreGeometryJSON(original.toJSON());
+  const restored = restoreGeometryJSON(serializeGeometryJSON(original));
   assert.equal(restored.getAttribute("position").count, original.getAttribute("position").count);
   assert.equal(restored.index.count, original.index.count);
   assert.equal(restored.groups.length, original.groups.length);
