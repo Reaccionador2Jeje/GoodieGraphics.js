@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import { fileURLToPath } from "node:url";
 
 export default defineConfig({
+  base: "./",
   server: { host: "0.0.0.0" },
   build: {
     target: "es2022",
