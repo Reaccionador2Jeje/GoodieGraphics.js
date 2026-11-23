@@ -314,8 +314,10 @@ $("fileInput").addEventListener("change", async (event) => {
     $("heightValue").value = $("terrainHeight").value;
     rebuildTerrain();
     for (const item of data.objects) {
-      if (!modelTypes.includes(item.type)) continue;
-      const object = makeModel(item.type);
+      const isShape = typeof item.type === "string" && item.type.startsWith("shape:");
+      const shapeType = isShape ? item.type.slice(6) : null;
+      if (isShape ? !shapeTypes.includes(shapeType) : !modelTypes.includes(item.type)) continue;
+      const object = isShape ? makeShape(shapeType) : makeModel(item.type);
       object.name = typeof item.name === "string" ? item.name : object.name;
       object.position.fromArray(item.position || [0, 0, 0]);
       object.rotation.set(...(item.rotation || [0, 0, 0]));
