@@ -2,20 +2,37 @@ import * as THREE from "three";
 import {
   Game, World, Models, GoodieShapes, ModelBuilder, ModelLoader, Materials,
   ParticleEmitter, Water, Glow, Terrain, DayNightCycle, Animator,
-  AnimationBuilder, AnimationPresets, GoodieShaders, LoopRepeat
+  AnimationBuilder, AnimationPresets, LoopRepeat
 } from "../src/index.js";
 
+function showFatalError(error) {
+  const message = error?.stack || error?.message || String(error);
+  console.error("[Blockhaven]", error);
+  let panel = document.getElementById("blockhaven-error");
+  if (!panel) {
+    panel = document.createElement("pre");
+    panel.id = "blockhaven-error";
+    panel.style.cssText = "position:fixed;z-index:99999;inset:12px;overflow:auto;white-space:pre-wrap;padding:18px;border-radius:12px;background:#210f16;color:#ffd7df;border:1px solid #ff718d;font:12px/1.5 monospace";
+    document.body.appendChild(panel);
+  }
+  panel.textContent = "BLOCKHAVEN NO PUDO INICIAR\\n\\n" + message;
+  document.getElementById("loading")?.classList.add("done");
+}
+window.addEventListener("error", (event) => showFatalError(event.error || event.message));
+window.addEventListener("unhandledrejection", (event) => showFatalError(event.reason));
+
+try {
 const $ = (id) => document.getElementById(id);
 const viewport = $("viewport");
 const BLOCK = 1;
 const WORLD_RADIUS = 13;
 const BLOCK_TYPES = {
-  grass: { label: "Hierba", material: GoodieShaders.voxel({ color: "#75a95a", roughness: 1, grain: .045, topLight: .17 }) },
-  dirt: { label: "Tierra", material: GoodieShaders.voxel({ color: "#96613d", roughness: 1, grain: .075, topLight: .08 }) },
-  stone: { label: "Piedra", material: GoodieShaders.voxel({ color: "#9299a3", roughness: .96, grain: .055, edgeLight: .035 }) },
-  wood: { label: "Madera", material: GoodieShaders.voxel({ color: "#a66e3e", roughness: .88, grain: .065, topLight: .1 }) },
-  sand: { label: "Arena", material: GoodieShaders.voxel({ color: "#d9bd78", roughness: 1, grain: .09, topLight: .14 }) },
-  crystal: { label: "Cristal", material: GoodieShaders.voxel({ color: "#69d9f2", roughness: .16, metalness: .12, emissive: "#1c8da9", emissiveIntensity: .42, grain: .018, topLight: .22, edgeLight: .15, transparent: true, opacity: .94 }) }
+  grass: { label: "Hierba", material: new THREE.MeshStandardMaterial({ color: "#75a95a", roughness: 1 }) },
+  dirt: { label: "Tierra", material: new THREE.MeshStandardMaterial({ color: "#96613d", roughness: 1 }) },
+  stone: { label: "Piedra", material: new THREE.MeshStandardMaterial({ color: "#9299a3", roughness: .96 }) },
+  wood: { label: "Madera", material: new THREE.MeshStandardMaterial({ color: "#a66e3e", roughness: .88 }) },
+  sand: { label: "Arena", material: new THREE.MeshStandardMaterial({ color: "#d9bd78", roughness: 1 }) },
+  crystal: { label: "Cristal", material: new THREE.MeshPhysicalMaterial({ color: "#69d9f2", roughness: .16, metalness: .12, emissive: "#1c8da9", emissiveIntensity: .42, transparent: true, opacity: .94, transmission: .12 }) }
 };
 const blockGeometry = GoodieShapes.box({ width: BLOCK, height: BLOCK, depth: BLOCK }).geometry;
 const blockMap = new Map();
@@ -403,3 +420,7 @@ window.addEventListener("beforeunload", () => {
 $("loading").classList.add("done");
 setTimeout(() => $("loading").remove(), 650);
 if (matchMedia("(pointer:coarse)").matches) $("help-card").classList.add("open");
+
+} catch (error) {
+  showFatalError(error);
+}
