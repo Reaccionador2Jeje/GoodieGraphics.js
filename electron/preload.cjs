@@ -5,7 +5,7 @@ contextBridge.exposeInMainWorld("goodieDesktop", Object.freeze({
   openScene: () => ipcRenderer.invoke("goodie:open"),
   setDirty: (dirty) => ipcRenderer.invoke("goodie:set-dirty", dirty),
   saveScene: (content, name) => ipcRenderer.invoke("goodie:save", content, name),
-  confirmNewScene: () => ipcRenderer.invoke("goodie:confirm-new"),
+  confirmDiscardChanges: () => ipcRenderer.invoke("goodie:confirm-discard"),
   showError: (message) => ipcRenderer.invoke("goodie:error", message),
   onCommand: (callback) => {
     if (typeof callback !== "function") return () => {};
