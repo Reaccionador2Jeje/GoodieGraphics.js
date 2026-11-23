@@ -44,7 +44,7 @@ export class AnimationPresets {
     right[axis] += angle;
     return new AnimationBuilder(target, { name, duration })
       .addVector3(target, "rotation", [0, duration / 2, duration],
-        [...base.toArray(), ...right.toArray(), ...base.toArray()], { interpolation: "smooth" })
+        [base.x, base.y, base.z, right.x, right.y, right.z, base.x, base.y, base.z], { interpolation: "smooth" })
       .build();
   }
 
@@ -57,9 +57,9 @@ export class AnimationPresets {
         basePosition.x, basePosition.y + height, basePosition.z,
         basePosition.x, basePosition.y, basePosition.z], { interpolation: "smooth" });
     builder.addVector3(target, "rotation", [0, duration / 2, duration],
-      [...baseRotation.toArray(),
+      [baseRotation.x, baseRotation.y, baseRotation.z,
         baseRotation.x, baseRotation.y, baseRotation.z + angle,
-        ...baseRotation.toArray()], { interpolation: "smooth" });
+        baseRotation.x, baseRotation.y, baseRotation.z], { interpolation: "smooth" });
     return builder.build();
   }
 
