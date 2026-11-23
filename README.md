@@ -165,7 +165,9 @@ Dispose effects when removing them permanently to release GPU resources.
 - `World`: scene container, lighting and ground helper.
 - `Terrain`: seeded procedural terrain and biome palettes.
 - `DayNightCycle`: dynamic sun, ambient light, sky and fog.
-- `Models`: optional procedural example assets.\n- `GoodieShapes`, `Shapes`, `ModelBuilder`: general-purpose geometry and custom model construction.\n- `ModelLoader`: GLTF, GLB, OBJ and FBX asset loading.
+- `Models`: optional procedural example assets.
+- `GoodieShapes`, `Shapes`, `ModelBuilder`: general-purpose geometry and custom model construction.
+- `ModelLoader`: GLTF, GLB, OBJ and FBX asset loading.
 - `Animator`, `AnimationBuilder`, `AnimationPresets`: GoodieAnimations keyframes, playback and motion presets.
 - `Materials`: reusable material presets.
 - `ParticleEmitter`, `Water`, `Glow`: GoodieFX real-time effects.
@@ -224,7 +226,8 @@ Then visit `http://localhost:5173/studio.html`. GoodieStudio is a browser-based 
 
 ### Editor features
 
-- Add ten ready-made procedural assets and sixteen general-purpose geometry primitives.\n- Combine primitive shapes to start building custom models.
+- Add ten ready-made procedural assets and sixteen general-purpose geometry primitives.
+- Combine primitive shapes to start building custom models.
 - Select objects from the viewport or scene hierarchy.
 - Edit position, rotation and scale in the inspector.
 - Duplicate and delete objects.
