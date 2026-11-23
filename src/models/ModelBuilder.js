@@ -10,7 +10,7 @@ export class ModelBuilder {
   }
 
   add(object, { name, position, rotation, scale, parent = this.root } = {}) {
-    if (!object?.isObject3D) throw new TypeError("ModelBuilder.add() expects a Three.js Object3D.");
+    if (!object?.isObject3D || object === this.root) throw new TypeError("ModelBuilder.add() expects a Three.js Object3D other than its own root.");
     if (!parent?.isObject3D || (parent !== this.root && !this.root.getObjectById(parent.id))) {
       throw new TypeError("Parent must belong to this model.");
     }
@@ -18,6 +18,9 @@ export class ModelBuilder {
     if (position) object.position.set(...position);
     if (rotation) object.rotation.set(...rotation);
     if (scale) object.scale.set(...scale);
+    for (let ancestor = parent; ancestor; ancestor = ancestor.parent) {
+      if (ancestor === object) throw new RangeError("Adding this object would create a scene graph cycle.");
+    }
     object.traverse((node) => {
       if (node.isMesh) {
         node.castShadow = true;
