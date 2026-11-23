@@ -180,7 +180,7 @@ Dispose effects when removing them permanently to release GPU resources.
 
 ## GoodieStudio Desktop
 
-GoodieStudio Desktop packages the existing 3D editor in a native application window. It includes native Open/Export dialogs, a File menu with keyboard shortcuts, and builds for Windows, macOS and Linux. The renderer uses context isolation and has Node.js integration disabled; file operations go through a restricted preload bridge.
+GoodieStudio Desktop packages the existing 3D editor in a native application window. It includes native Open/Export dialogs, a File menu with keyboard shortcuts, unsaved-change protection when closing, opening or creating scenes, and builds for Windows, macOS and Linux. The renderer uses context isolation and has Node.js integration disabled; file operations go through a restricted preload bridge.
 
 ```bash
 npm install
