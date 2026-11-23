@@ -43,6 +43,7 @@ export class Game {
     this._frame = this._frame.bind(this);
     this._resize = this._resize.bind(this);
     this._lastTime = 0;
+    this._startTime = 0;
     this._onUpdate = null;
   }
 
@@ -64,6 +65,7 @@ export class Game {
     if (this.running) return this;
     this.running = true;
     this._lastTime = performance.now();
+    this._startTime = this._lastTime;
     window.addEventListener("resize", this._resize);
     this.renderer.setAnimationLoop(this._frame);
     return this;
@@ -80,7 +82,7 @@ export class Game {
     if (!this.running || !this.world) return;
     const delta = Math.min((time - this._lastTime) / 1000, 0.05);
     this._lastTime = time;
-    this._onUpdate?.(delta, time / 1000);
+    this._onUpdate?.(delta, (time - this._startTime) / 1000);
     this.renderer.render(this.world.scene, this.camera);
   }
 
