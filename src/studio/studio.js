@@ -337,7 +337,15 @@ async function importSceneText(text) {
   $("fileInput").value = ""; refresh(); markClean("● Imported");
 }
 
+async function confirmDiscardChanges() {
+  if (!hasUnsavedChanges) return true;
+  return window.goodieDesktop?.isDesktop
+    ? window.goodieDesktop.confirmDiscardChanges()
+    : confirm("Discard your unsaved changes and continue?");
+}
+
 async function openScene() {
+  if (!await confirmDiscardChanges()) return;
   if (window.goodieDesktop?.isDesktop) {
     try { const file = await window.goodieDesktop.openScene(); if (file) await importSceneText(file.content); }
     catch (error) { await window.goodieDesktop.showError(error.message); }
@@ -347,12 +355,7 @@ async function openScene() {
 }
 
 async function createNewScene() {
-  if (hasUnsavedChanges) {
-    const confirmed = window.goodieDesktop?.isDesktop
-      ? await window.goodieDesktop.confirmNewScene()
-      : confirm("Start a new scene? Your current scene will be cleared unless you exported it.");
-    if (!confirmed) return;
-  }
+  if (!await confirmDiscardChanges()) return;
   objects.slice().forEach((object) => { selected = object; removeSelected(); });
   sceneName = "Untitled world";
   $("biome").value = "meadow"; $("seed").value = 7; $("terrainHeight").value = 4; $("heightValue").value = 4;
