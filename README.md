@@ -13,6 +13,11 @@ Blockhaven is an original block-building and exploration sandbox built as a play
 
 Run it locally with `npm install` and `npm run dev`, then open [http://localhost:5173/blockhaven.html](http://localhost:5173/blockhaven.html). The production build includes the game at `/blockhaven.html`. Worlds can be saved in the browser's local storage.
 
+
+### GoodieGraphics rendering and shaders
+
+Blockhaven uses the library's ACES filmic tone mapping, sRGB output, PCF soft shadows, low-poly procedural Models, biome vertex-color Terrain, animated Water shader, Glow sprites and the exported `GoodieShaders.voxel()` physically based material. The voxel shader adds subtle world-space surface grain and face-aware lighting while retaining standard-material lighting and shadows. Six block materials use this shader with individual tuning; crystals retain emissive lighting and the world uses higher-resolution directional shadows.
+
 ## Get the project
 
 ```bash
