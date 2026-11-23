@@ -1,15 +1,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { Models, World, Materials, ParticleEmitter, Water, Terrain, DayNightCycle, version } from "../src/index.js";
+import { Models, World, Materials, ParticleEmitter, Water, Terrain, DayNightCycle, Animator, AnimationBuilder, AnimationPresets, version, LoopOnce } from "../src/index.js";
 
 test("exports the public API", () => {
-  assert.equal(version, "0.3.0");
+  assert.equal(version, "0.4.0");
   assert.equal(typeof World, "function");
   assert.equal(typeof Materials.gold, "function");
   assert.equal(typeof ParticleEmitter, "function");
   assert.equal(typeof Water, "function");
   assert.equal(typeof Terrain, "function");
   assert.equal(typeof DayNightCycle, "function");
+  assert.equal(typeof Animator, "function");
+  assert.equal(typeof AnimationBuilder, "function");
+  assert.equal(typeof AnimationPresets, "function");
 });
 
 test("every procedural model returns a named Three.js Group", () => {
@@ -113,4 +116,34 @@ test("DayNightCycle updates world lighting and supports time controls", () => {
   assert.equal(cycle.time, 0.75);
   assert.equal(cycle.pause(), cycle);
   assert.equal(cycle.resume(), cycle);
+});
+
+test("GoodieAnimations builds and plays keyframe clips", () => {
+  const model = Models.tree();
+  const clip = new AnimationBuilder(model, { name: "TestMove", duration: 1 })
+    .addVector3(model, "position", [0, 0.5, 1], [0, 0, 0, 0, 2, 0, 0, 0, 0], { interpolation: "smooth" })
+    .build();
+  const animator = new Animator(model, { clips: [clip] });
+  animator.play("TestMove", { loop: LoopOnce, repetitions: 1, clampWhenFinished: true });
+  animator.update(0.5);
+  assert.ok(model.position.y > 0);
+  assert.equal(animator.pause(), animator);
+  assert.equal(animator.resume(), animator);
+  assert.equal(animator.setTimeScale(0.5), animator);
+  assert.equal(animator.stop(), animator);
+  animator.dispose();
+});
+
+test("GoodieAnimations presets create named clips and validate tracks", () => {
+  const model = Models.crystal();
+  const idle = AnimationPresets.idle(model);
+  const spin = AnimationPresets.spin(model, { turns: 2 });
+  const pulse = AnimationPresets.pulse(model);
+  const sway = AnimationPresets.sway(model);
+  assert.equal(idle.name, "Idle");
+  assert.equal(spin.name, "Spin");
+  assert.equal(pulse.name, "Pulse");
+  assert.equal(sway.name, "Sway");
+  assert.throws(() => new AnimationBuilder(model).addVector3(model, "position", [0, 0], [0, 1], {}), /values must contain/);
+  assert.throws(() => new Animator(model).play("missing"), /was not found/);
 });
