@@ -1,3 +1,5 @@
+import { Vector3 } from "three";
+
 /**
  * Non-destructive geometry operations for GoodieStudio.
  * Each operation clones source geometries before editing so duplicated objects
@@ -49,7 +51,7 @@ export function editGeometry(root, operation, axis = "x") {
     const geometry = mesh.geometry.clone();
     if (operation === "center") {
       geometry.computeBoundingBox();
-      const center = geometry.boundingBox.getCenter({ x: 0, y: 0, z: 0 });
+      const center = geometry.boundingBox.getCenter(new Vector3());
       geometry.translate(-center.x, -center.y, -center.z);
       mesh.position.add(center);
     } else if (operation === "normals") {
