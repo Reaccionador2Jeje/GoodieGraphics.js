@@ -297,9 +297,10 @@ function groupAllObjects() {
 function ungroupSelected() {
   if (!selected?.userData.goodieGroup) return;
   const group = selected; transformControls.detach();
+  const parent = group.parent || scene;
   const children = group.children.filter(child => child.userData?.goodieType || child.userData?.goodieGroup);
-  for (const child of [...children]) { scene.attach(child); objects.push(child); }
-  scene.remove(group); selected = null; refresh(); markChanged();
+  for (const child of [...children]) { parent.attach(child); if (parent === scene) objects.push(child); }
+  parent.remove(group); selected = null; refresh(); markChanged();
 }
 function markChanged() {
   const wasClean = !hasUnsavedChanges;
@@ -357,8 +358,10 @@ $("applyTerrain").addEventListener("click", rebuildTerrain);
 function removeSelected() {
   if (!selected) return;
   transformControls.detach();
-  scene.remove(selected);
-  const index = objects.indexOf(selected);
+  const target = selected;
+  const parent = target.parent || scene;
+  parent.remove(target);
+  const index = objects.indexOf(target);
   if (index >= 0) objects.splice(index, 1);
   selected.traverse((node) => {
     if (node.isMesh) {
@@ -376,7 +379,8 @@ $("groupObjects").addEventListener("click", groupAllObjects);
 $("ungroupObject").addEventListener("click", ungroupSelected);
 $("duplicateObject").addEventListener("click", () => {
   if (!selected) return;
-  const copy = selected.clone(true);
+  const source = selected;
+  const copy = source.clone(true);
   copy.traverse((node) => {
     if (!node.isMesh) return;
     node.geometry = node.geometry.clone();
@@ -385,10 +389,11 @@ $("duplicateObject").addEventListener("click", () => {
       : node.material.clone();
   });
   copy.userData.editorId = nextId++;
-  copy.name = selected.name.replace(/ \d+$/, "") + " " + copy.userData.editorId;
+  copy.name = source.name.replace(/ \d+$/, "") + " " + copy.userData.editorId;
   copy.position.add(new THREE.Vector3(1.5, 0, 1.5));
-  scene.add(copy);
-  objects.push(copy);
+  const parent = source.parent || scene;
+  parent.add(copy);
+  if (parent === scene) objects.push(copy);
   selectObject(copy);
   markChanged();
 });
