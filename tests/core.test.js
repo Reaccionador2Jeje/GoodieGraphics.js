@@ -1,12 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as THREE from "three";
-import { Models, World, Materials, version } from "../src/index.js";
+import { Models, World, Materials, ParticleEmitter, Water, version } from "../src/index.js";
 
-test("exports the initial public API", () => {
-  assert.equal(version, "0.1.0");
+test("exports the public API", () => {
+  assert.equal(version, "0.2.0");
   assert.equal(typeof World, "function");
   assert.equal(typeof Materials.gold, "function");
+  assert.equal(typeof ParticleEmitter, "function");
+  assert.equal(typeof Water, "function");
 });
 
 test("every procedural model returns a named Three.js Group", () => {
@@ -61,4 +63,24 @@ test("World adds, removes and creates a ground plane", () => {
 test("World.add rejects non-3D values", () => {
   const world = new World();
   assert.throws(() => world.add({}), /Three.js Object3D/);
+});
+
+test("ParticleEmitter creates a fixed point buffer and supports updates", () => {
+  const emitter = new ParticleEmitter({ count: 12 });
+  assert.equal(emitter.points.isPoints, true);
+  assert.equal(emitter.points.geometry.attributes.position.count, 12);
+  assert.equal(emitter.burst(5), emitter);
+  assert.equal(emitter.update(1 / 60), emitter);
+  assert.equal(emitter.stop(), emitter);
+  assert.equal(emitter.start(), emitter);
+  emitter.dispose();
+});
+
+test("Water exposes an animated mesh and advances its shader clock", () => {
+  const water = new Water({ width: 6, height: 4 });
+  assert.equal(water.mesh.isMesh, true);
+  assert.equal(water.mesh.name, "GoodieWater");
+  water.update(0.5);
+  assert.ok(water.mesh.material.uniforms.uTime.value > 0);
+  water.dispose();
 });
