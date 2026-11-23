@@ -15,3 +15,5 @@ export { AnimationBuilder } from "./animations/AnimationBuilder.js";
 export { AnimationPresets } from "./animations/AnimationPresets.js";
 
 export const version = "1.0.0";
+
+export { GoodieShaders } from "./shaders/GoodieShaders.js";
