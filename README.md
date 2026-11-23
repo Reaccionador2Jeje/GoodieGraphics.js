@@ -141,6 +141,35 @@ Dispose effects when removing them permanently to release GPU resources.
 
 MIT. See [LICENSE](./LICENSE).
 
+## GoodieAnimations: professional 3D motion
+
+Animate any Three.js object hierarchy with keyframe clips, quaternion tracks, reusable motion presets, playback controls and cross-fades.
+
+### Quick animation
+
+```js
+const character = Goodie.Models.tree();
+world.add(character);
+const animator = new Goodie.Animator(character, {
+  clips: [Goodie.AnimationPresets.idle(character), Goodie.AnimationPresets.sway(character)]
+});
+animator.play("Idle");
+game.onUpdate((delta) => animator.update(delta));
+
+// Blend to another animation without a hard cut.
+animator.crossFadeTo("Sway", { duration: 0.4 });
+animator.dispose();
+```
+
+### Build custom keyframe clips
+
+```js
+const jump = new Goodie.AnimationBuilder(character, { name: "Jump", duration: 0.8 })
+  .addVector3(character, "position", [0, 0.4, 0.8], [0, 0, 0, 0, 1.8, 0, 0, 0, 0], { interpolation: "smooth" })
+  .build();
+const animator = new Goodie.Animator(character, { clips: [jump] });
+animator.play("Jump", { loop: Goodie.LoopOnce, repetitions: 1, clampWhenFinished: true });
+```
 ## GoodieStudio: visual world editor
 
 Open the visual editor at [`/studio.html`](./studio.html) after starting the development server:
