@@ -246,6 +246,7 @@ Then visit `http://localhost:5173/studio.html`. GoodieStudio is a browser-based 
 - Select objects from the viewport or scene hierarchy.
 - Edit position, rotation and scale in the inspector or with interactive 3D transform gizmos in the viewport.
 - Edit mesh base color, roughness, metalness, opacity and wireframe from the material inspector.
+- Edit mesh geometry non-destructively with pivot centering, normal recalculation and X/Y/Z mirroring; the editor clones geometry before changes and persists edited buffers in scene files.
 - Switch between move, rotate and scale modes with toolbar buttons or W/E/R keyboard shortcuts.
 - Duplicate and delete objects.
 - Organize the scene with real nested groups; Group all root objects and ungroup a selected group.
