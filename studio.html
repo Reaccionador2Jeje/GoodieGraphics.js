@@ -69,8 +69,8 @@
         </aside>
         <section class="viewport-wrap">
           <div class="viewport" id="viewport">
-            <div class="viewport-top"><div class="scene-title"><span class="live-dot"></span><span>Untitled world</span><span class="scene-tag">3D SCENE</span></div><div class="viewport-tools"><button class="tool-button active" id="orbitTool" title="Orbit camera">◉</button><button class="tool-button" id="focusTool" title="Focus selection">⌖</button><button class="tool-button" id="resetCamera" title="Reset camera">↺</button></div></div>
-            <div class="viewport-hint">DRAG TO ORBIT <span>·</span> PINCH / SCROLL TO ZOOM <span>·</span> TAP AN OBJECT TO SELECT</div>
+            <div class="viewport-top"><div class="scene-title"><span class="live-dot"></span><span>Untitled world</span><span class="scene-tag">3D SCENE</span></div><div class="viewport-tools"><button class="tool-button active" data-transform-mode="translate" title="Move (W)" aria-label="Move object" aria-pressed="true">↔</button><button class="tool-button" data-transform-mode="rotate" title="Rotate (E)" aria-label="Rotate object" aria-pressed="false">⟳</button><button class="tool-button" data-transform-mode="scale" title="Scale (R)" aria-label="Scale object" aria-pressed="false">⤢</button><button class="tool-button" id="focusTool" title="Focus selection">⌖</button><button class="tool-button" id="resetCamera" title="Reset camera">↺</button></div></div>
+            <div class="viewport-hint">W MOVE <span>·</span> E ROTATE <span>·</span> R SCALE <span>·</span> DRAG TO EDIT</div>
             <div id="canvasHost"></div>
             <div class="selection-toast" id="selectionToast">Nothing selected</div>
           </div>
