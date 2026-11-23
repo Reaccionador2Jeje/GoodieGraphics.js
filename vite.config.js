@@ -9,7 +9,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: fileURLToPath(new URL("./index.html", import.meta.url)),
-        studio: fileURLToPath(new URL("./studio.html", import.meta.url))
+        studio: fileURLToPath(new URL("./studio.html", import.meta.url)),
+        blockhaven: fileURLToPath(new URL("./blockhaven.html", import.meta.url))
       }
     }
   }
