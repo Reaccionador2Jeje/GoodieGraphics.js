@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as THREE from "three";
-import { editGeometry, inspectGeometry } from "../src/studio/GeometryTools.js";
+import { editGeometry, inspectGeometry, restoreGeometryJSON } from "../src/studio/GeometryTools.js";
 
 function close(actual, expected, epsilon = 1e-6) {
   assert.ok(Math.abs(actual - expected) <= epsilon, `Expected ${actual} to be close to ${expected}`);
@@ -63,4 +63,21 @@ test("invalid operations and mirror axes are rejected", () => {
 test("objects without mesh descendants are safe no-ops", () => {
   const group = new THREE.Group();
   assert.deepEqual(editGeometry(group, "center"), { meshes: 0, vertices: 0, triangles: 0 });
+});
+
+test("serialized edited geometry can be restored with its attributes and groups", () => {
+  const original = new THREE.BoxGeometry(2, 3, 4, 2, 2, 2);
+  original.addGroup(0, 6, 0);
+  original.translate(1, 2, 3);
+  const restored = restoreGeometryJSON(original.toJSON());
+  assert.equal(restored.getAttribute("position").count, original.getAttribute("position").count);
+  assert.equal(restored.index.count, original.index.count);
+  assert.equal(restored.groups.length, original.groups.length);
+  close(restored.getAttribute("position").getX(0), original.getAttribute("position").getX(0));
+  close(restored.getAttribute("normal").getZ(0), original.getAttribute("normal").getZ(0));
+});
+
+test("invalid geometry JSON is rejected", () => {
+  assert.throws(() => restoreGeometryJSON({}), /Invalid serialized BufferGeometry/);
+  assert.throws(() => restoreGeometryJSON({ data: { attributes: { position: { type: "EvilArray", itemSize: 3, array: [] } } } }), /Invalid serialized geometry attribute/);
 });
