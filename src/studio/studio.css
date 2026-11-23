@@ -6,3 +6,5 @@
 @media(max-width:430px){.brand small{font-size:7px}.brand-mark{width:30px;height:30px}.top-actions .button.ghost{display:none}.asset-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.asset-card b{font-size:9px}.viewport{min-height:360px}.viewport-hint{letter-spacing:0}.scene-title{font-size:10px}}
 
 .desktop-indicator{display:none;color:#9eb0c2;font:9px 'DM Mono',monospace;letter-spacing:1.2px;padding:5px 7px;border:1px solid #354454;border-radius:6px}.desktop-app .desktop-indicator{display:inline-flex;align-items:center}@media(max-width:760px){.desktop-indicator{display:none}}
+
+.material-grid{display:grid;gap:10px;margin-top:8px}.material-control{display:grid;grid-template-columns:82px minmax(0,1fr);align-items:center;gap:8px;color:#aab5c2;font-size:10px}.material-control input{width:100%;min-width:0;accent-color:var(--accent)}.material-control input[type=color]{height:28px;padding:2px;border:1px solid #344151;border-radius:6px;background:#111923}.material-control input[type=range]{margin:0}.material-toggle{display:flex;align-items:center;gap:8px;color:#aab5c2;font-size:10px}.material-toggle input{accent-color:var(--accent)}
