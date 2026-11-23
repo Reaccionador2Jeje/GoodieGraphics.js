@@ -140,3 +140,25 @@ Dispose effects when removing them permanently to release GPU resources.
 ## License
 
 MIT. See [LICENSE](./LICENSE).
+
+## GoodieStudio: visual world editor
+
+Open the visual editor at [`/studio.html`](./studio.html) after starting the development server:
+
+```bash
+npm install
+npm run dev
+```
+
+Then visit `http://localhost:5173/studio.html`. GoodieStudio is a browser-based scene builder designed for mouse, touch and smaller screens.
+
+### Editor features
+
+- Add the ten procedural assets from the GoodieModels library.
+- Select objects from the viewport or scene hierarchy.
+- Edit position, rotation and scale in the inspector.
+- Duplicate and delete objects.
+- Generate seeded terrain across all five GoodieWorld biomes.
+- Export a scene to a `.goodie.json` file and import it later.
+
+The scene format stores asset type, transforms, scene name and terrain settings. Imported files are validated before their contents are added. GoodieStudio is an early editor: it currently focuses on procedural assets and transforms rather than arbitrary mesh or material authoring.
