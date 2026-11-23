@@ -66,9 +66,11 @@ test("World adds, removes and creates a ground plane", () => {
   assert.equal(world.objects.has(ground), true);
 });
 
-test("World.add rejects non-3D values", () => {
+test("World.add rejects invalid objects without partially mutating the scene", () => {
   const world = new World();
-  assert.throws(() => world.add({}), /Three.js Object3D/);
+  const valid = Models.rock();
+  assert.throws(() => world.add(valid, {}), /Three.js Object3D/);
+  assert.equal(world.scene.children.includes(valid), false);
 });
 
 test("ParticleEmitter creates a fixed point buffer and supports updates", () => {
@@ -196,4 +198,19 @@ test("ModelBuilder assembles arbitrary meshes and nested groups", () => {
   assert.equal(ModelBuilder.from(model).build().children.length, model.children.length);
   assert.equal(typeof ModelLoader.gltf, "function");
 });
-\n\ntest("Terrain validates dimensions, density and query coordinates", () => {\n  assert.throws(() => new Terrain({ width: 0 }), /width and depth/);\n  assert.throws(() => new Terrain({ segments: 513 }), /between 2 and 512/);\n  const terrain = new Terrain({ segments: 4 });\n  assert.throws(() => terrain.getHeightAt(Number.NaN, 0), /finite numbers/);\n  terrain.dispose();\n});\n\ntest("ModelBuilder prevents cyclic scene graphs", () => {\n  const builder = new ModelBuilder();\n  const parent = builder.group("Parent");\n  const child = builder.group("Child", { parent });\n  assert.throws(() => builder.add(parent, { parent: child }), /cycle/);\n});\n
+
+
+test("Terrain validates dimensions, density and query coordinates", () => {
+  assert.throws(() => new Terrain({ width: 0 }), /width and depth/);
+  assert.throws(() => new Terrain({ segments: 513 }), /between 2 and 512/);
+  const terrain = new Terrain({ segments: 4 });
+  assert.throws(() => terrain.getHeightAt(Number.NaN, 0), /finite numbers/);
+  terrain.dispose();
+});
+
+test("ModelBuilder prevents cyclic scene graphs", () => {
+  const builder = new ModelBuilder();
+  const parent = builder.group("Parent");
+  const child = builder.group("Child", { parent });
+  assert.throws(() => builder.add(parent, { parent: child }), /cycle/);
+});
