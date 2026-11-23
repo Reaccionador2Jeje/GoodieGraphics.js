@@ -287,57 +287,82 @@ function serializeScene() {
     }))
   };
 }
-function exportScene() {
+async function exportScene() {
   const data = JSON.stringify(serializeScene(), null, 2);
+  const suggestedName = (sceneName.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "goodie-world") + ".goodie.json";
+  if (window.goodieDesktop?.isDesktop) {
+    try {
+      if (await window.goodieDesktop.saveScene(data, suggestedName)) $("saveState").textContent = "● Exported";
+    } catch (error) { await window.goodieDesktop.showError(error.message); }
+    return;
+  }
   const url = URL.createObjectURL(new Blob([data], { type: "application/json" }));
   const link = document.createElement("a");
-  link.href = url;
-  link.download = (sceneName.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "goodie-world") + ".goodie.json";
-  link.click();
-  URL.revokeObjectURL(url);
+  link.href = url; link.download = suggestedName; link.click(); URL.revokeObjectURL(url);
   $("saveState").textContent = "● Exported";
 }
-$("exportScene").addEventListener("click", exportScene);
-$("importScene").addEventListener("click", () => $("fileInput").click());
-$("fileInput").addEventListener("change", async (event) => {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  try {
-    const data = JSON.parse(await file.text());
-    if (data.format !== "goodie-studio" || !Array.isArray(data.objects)) throw new Error("This is not a GoodieStudio scene file.");
-    objects.slice().forEach((object) => { selected = object; removeSelected(); });
-    sceneName = typeof data.name === "string" ? data.name : "Imported world";
-    const terrainData = data.terrain || { biome: "meadow", seed: 7, amplitude: 4 };
-    $("biome").value = terrainData.biome || "meadow";
-    $("seed").value = terrainData.seed ?? 7;
-    $("terrainHeight").value = terrainData.amplitude ?? 4;
-    $("heightValue").value = $("terrainHeight").value;
-    rebuildTerrain();
-    for (const item of data.objects) {
-      const isShape = typeof item.type === "string" && item.type.startsWith("shape:");
-      const shapeType = isShape ? item.type.slice(6) : null;
-      if (isShape ? !shapeTypes.includes(shapeType) : !modelTypes.includes(item.type)) continue;
-      const object = isShape ? makeShape(shapeType) : makeModel(item.type);
-      object.name = typeof item.name === "string" ? item.name : object.name;
-      object.position.fromArray(item.position || [0, 0, 0]);
-      object.rotation.set(...(item.rotation || [0, 0, 0]));
-      object.scale.fromArray(item.scale || [1, 1, 1]);
-    }
-    $("saveState").textContent = "● Imported";
-    $("fileInput").value = "";
-    refresh();
-  } catch (error) {
-    alert("Could not import scene: " + error.message);
+
+async function importSceneText(text) {
+  const data = JSON.parse(text);
+  if (data.format !== "goodie-studio" || !Array.isArray(data.objects)) throw new Error("This is not a GoodieStudio scene file.");
+  objects.slice().forEach((object) => { selected = object; removeSelected(); });
+  sceneName = typeof data.name === "string" ? data.name : "Imported world";
+  const terrainData = data.terrain || { biome: "meadow", seed: 7, amplitude: 4 };
+  $("biome").value = terrainData.biome || "meadow";
+  $("seed").value = terrainData.seed ?? 7;
+  $("terrainHeight").value = terrainData.amplitude ?? 4;
+  $("heightValue").value = $("terrainHeight").value;
+  rebuildTerrain();
+  for (const item of data.objects) {
+    const isShape = typeof item.type === "string" && item.type.startsWith("shape:");
+    const shapeType = isShape ? item.type.slice(6) : null;
+    if (isShape ? !shapeTypes.includes(shapeType) : !modelTypes.includes(item.type)) continue;
+    const object = isShape ? makeShape(shapeType) : makeModel(item.type);
+    object.name = typeof item.name === "string" ? item.name : object.name;
+    object.position.fromArray(item.position || [0, 0, 0]);
+    object.rotation.set(...(item.rotation || [0, 0, 0]));
+    object.scale.fromArray(item.scale || [1, 1, 1]);
   }
-});
-$("newScene").addEventListener("click", () => {
-  if (objects.length && !confirm("Start a new scene? Your current scene will be cleared unless you exported it.")) return;
+  $("saveState").textContent = "● Imported"; $("fileInput").value = ""; refresh();
+}
+
+async function openScene() {
+  if (window.goodieDesktop?.isDesktop) {
+    try { const file = await window.goodieDesktop.openScene(); if (file) await importSceneText(file.content); }
+    catch (error) { await window.goodieDesktop.showError(error.message); }
+    return;
+  }
+  $("fileInput").click();
+}
+
+async function createNewScene() {
+  if (objects.length) {
+    const confirmed = window.goodieDesktop?.isDesktop
+      ? await window.goodieDesktop.confirmNewScene()
+      : confirm("Start a new scene? Your current scene will be cleared unless you exported it.");
+    if (!confirmed) return;
+  }
   objects.slice().forEach((object) => { selected = object; removeSelected(); });
   sceneName = "Untitled world";
   $("biome").value = "meadow"; $("seed").value = 7; $("terrainHeight").value = 4; $("heightValue").value = 4;
-  rebuildTerrain();
-  $("saveState").textContent = "● Ready";
-  $("selectionToast").textContent = "Nothing selected";
+  rebuildTerrain(); $("saveState").textContent = "● Ready"; $("selectionToast").textContent = "Nothing selected";
+}
+
+$("exportScene").addEventListener("click", exportScene);
+$("importScene").addEventListener("click", openScene);
+$("newScene").addEventListener("click", createNewScene);
+$("fileInput").addEventListener("change", async (event) => {
+  const file = event.target.files?.[0]; if (!file) return;
+  try { await importSceneText(await file.text()); }
+  catch (error) {
+    if (window.goodieDesktop?.isDesktop) await window.goodieDesktop.showError(error.message);
+    else console.error("Could not import scene:", error);
+  }
+});
+window.goodieDesktop?.onCommand((name) => {
+  if (name === "new") createNewScene();
+  if (name === "open") openScene();
+  if (name === "save") exportScene();
 });
 
 function resize() {
