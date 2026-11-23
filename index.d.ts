@@ -205,3 +205,7 @@ export declare class AnimationPresets {
 export declare const LoopOnce: typeof THREE.LoopOnce;
 export declare const LoopRepeat: typeof THREE.LoopRepeat;
 export declare const LoopPingPong: typeof THREE.LoopPingPong;
+
+export declare const GoodieShaders: {
+  voxel(options?: { color?: string | number; roughness?: number; metalness?: number; grain?: number; topLight?: number; edgeLight?: number; emissive?: string | number; emissiveIntensity?: number; [key: string]: unknown }): import("three").MeshStandardMaterial;
+};
