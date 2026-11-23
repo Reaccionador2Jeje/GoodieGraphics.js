@@ -303,13 +303,19 @@ function updatePlayer(delta) {
 }
 
 function update(delta) {
-  updatePlayer(delta);
-  dayNight.update(delta);
-  water.update(delta);
-  for (const animator of animators) animator.update(delta);
-  miningParticles.update(delta);
-  blockActionCooldown = Math.max(0, blockActionCooldown - delta);
-  day = (day + delta) % 300;
+  // Algunos navegadores móviles pueden entregar un delta negativo al reanudar
+  // una pestaña. Los sistemas de animación requieren siempre tiempo >= 0.
+  const safeDelta = Number.isFinite(delta)
+    ? THREE.MathUtils.clamp(delta, 0, 0.05)
+    : 0;
+
+  updatePlayer(safeDelta);
+  dayNight.update(safeDelta);
+  water.update(safeDelta);
+  for (const animator of animators) animator.update(safeDelta);
+  miningParticles.update(safeDelta);
+  blockActionCooldown = Math.max(0, blockActionCooldown - safeDelta);
+  day = (day + safeDelta) % 300;
   const hours = Math.floor((day / 300) * 24);
   $("world-time").textContent = "DÍA 1 · " + String(hours).padStart(2,"0") + ":00";
 }
