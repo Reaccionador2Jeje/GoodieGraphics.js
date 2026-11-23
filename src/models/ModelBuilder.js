@@ -58,7 +58,16 @@ export class ModelBuilder {
   static from(object, { clone = true, name = "GoodieImportedModel" } = {}) {
     if (!object?.isObject3D) throw new TypeError("ModelBuilder.from() expects an Object3D.");
     const builder = new ModelBuilder({ name });
-    builder.root.add(clone ? object.clone(true) : object);
+    builder.root.position.copy(object.position);
+    builder.root.quaternion.copy(object.quaternion);
+    builder.root.scale.copy(object.scale);
+
+    // Import the source root's direct children so the resulting builder keeps
+    // the same top-level scene graph instead of adding an extra wrapper level.
+    const children = object.children.length ? [...object.children] : [object];
+    for (const child of children) {
+      builder.root.add(clone ? child.clone(true) : child);
+    }
     return builder;
   }
 }
