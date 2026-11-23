@@ -116,8 +116,7 @@ function selectObject(object, additive = false) {
   if (additive && object) {
     if (selectedObjects.has(object)) selectedObjects.delete(object);
     else selectedObjects.add(object);
-    selected = object;
-    if (selectedObjects.size === 0) selectedObjects.add(object);
+    selected = [...selectedObjects].at(-1) || null;
   } else {
     selectedObjects.clear();
     if (object) selectedObjects.add(object);
