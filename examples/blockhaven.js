@@ -196,7 +196,7 @@ game.camera.add(toolModel);
 world.scene.add(game.camera);
 
 game.setWorld(world);
-const player = new THREE.Vector3(0, topAt(0,0) + 1.72, 0);
+const player = new THREE.Vector3(0, topAt(0,0) + 2.72, 0);
 game.camera.position.copy(player);
 const cycle = dayNight;
 let blockActionCooldown = 0;
@@ -262,10 +262,10 @@ function updatePlayer(delta) {
   if (!collides(player.x, nextZ)) player.z = nextZ;
   verticalVelocity -= 18 * delta;
   player.y += verticalVelocity * delta;
-  const ground = topAt(Math.floor(player.x), Math.floor(player.z)) + 1.72;
+  const ground = topAt(Math.floor(player.x), Math.floor(player.z)) + 2.72;
   if (player.y <= ground) { player.y = ground; verticalVelocity = 0; grounded = true; }
   else grounded = false;
-  if (player.y < -10) { player.set(0, topAt(0,0) + 1.72, 0); verticalVelocity = 0; showToast("Has regresado al punto de inicio"); }
+  if (player.y < -10) { player.set(0, topAt(0,0) + 2.72, 0); verticalVelocity = 0; showToast("Has regresado al punto de inicio"); }
   game.camera.position.copy(player);
   game.camera.rotation.order = "YXZ";
   game.camera.rotation.set(pitch, yaw, 0);
