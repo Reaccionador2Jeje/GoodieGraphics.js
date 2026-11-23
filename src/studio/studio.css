@@ -23,3 +23,10 @@
 
 /* Multi-selection hierarchy feedback */
 .hierarchy-row.selected{outline:1px solid #a87946;outline-offset:-1px}
+
+/* Geometry editing tools */
+.geometry-stats{margin:0 0 8px;font-variant-numeric:tabular-nums}
+.geometry-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:7px 0}
+.geometry-actions .button{min-width:0;padding:8px 5px;font-size:10px}
+.geometry-actions .button:disabled{opacity:.38;cursor:not-allowed}
+.geometry-mirror{grid-template-columns:repeat(3,minmax(0,1fr))}
