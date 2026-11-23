@@ -48,11 +48,11 @@ function registerHandlers() {
     hasUnsavedChanges = false;
     return true;
   });
-  ipcMain.handle("goodie:confirm-new", async () => {
+  ipcMain.handle("goodie:confirm-discard", async () => {
     const result = await dialog.showMessageBox(windowRef, {
-      type: "warning", title: "Create a new scene?", message: "Your current scene will be cleared.",
+      type: "warning", title: "Discard unsaved changes?", message: "Your current scene has unsaved changes.",
       detail: "Export your scene first if you want to keep a copy.",
-      buttons: ["Cancel", "Create new scene"], defaultId: 0, cancelId: 0, noLink: true
+      buttons: ["Cancel", "Discard changes"], defaultId: 0, cancelId: 0, noLink: true
     });
     return result.response === 1;
   });
