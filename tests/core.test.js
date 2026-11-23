@@ -214,3 +214,15 @@ test("ModelBuilder prevents cyclic scene graphs", () => {
   const child = builder.group("Child", { parent });
   assert.throws(() => builder.add(parent, { parent: child }), /cycle/);
 });
+
+test("Effects and day/night settings reject invalid numeric values", () => {
+  assert.throws(() => new ParticleEmitter({ count: 0 }), /Particle count/);
+  assert.throws(() => new ParticleEmitter({ lifetime: -1 }), /lifetime/);
+  assert.throws(() => new Water({ opacity: 2 }), /opacity/);
+  assert.throws(() => new Water({ segments: 300 }), /segments/);
+  assert.throws(() => new DayNightCycle(new World(), { duration: 0 }), /duration/);
+});
+
+test("ModelLoader rejects unknown asset formats with a useful error", async () => {
+  await assert.rejects(ModelLoader.load("/assets/model.stl"), /Unsupported model format/);
+});
