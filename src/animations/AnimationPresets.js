@@ -1,4 +1,3 @@
-import * as THREE from "three";
 import { AnimationBuilder } from "./AnimationBuilder.js";
 
 /** Ready-to-use motion clips for procedural models and simple object rigs. */
@@ -39,8 +38,7 @@ export class AnimationPresets {
   static sway(target, { angle = 0.16, duration = 2.4, axis = "z", name = "Sway" } = {}) {
     if (!["x", "y", "z"].includes(axis)) throw new RangeError("Sway axis must be x, y or z.");
     const base = target.rotation.clone();
-    const left = base.clone(), right = base.clone();
-    left[axis] -= angle;
+    const right = base.clone();
     right[axis] += angle;
     return new AnimationBuilder(target, { name, duration })
       .addVector3(target, "rotation", [0, duration / 2, duration],
@@ -61,9 +59,5 @@ export class AnimationPresets {
         baseRotation.x, baseRotation.y, baseRotation.z + angle,
         baseRotation.x, baseRotation.y, baseRotation.z], { interpolation: "smooth" });
     return builder.build();
-  }
-
-  static get THREE() {
-    return THREE;
   }
 }
