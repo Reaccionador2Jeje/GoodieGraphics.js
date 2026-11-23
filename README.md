@@ -2,7 +2,7 @@
 
 **Make the Web 3D Delicious.**
 
-GoodieGraphics.js is a high-level 3D graphics toolkit for the web, powered by Three.js. It combines a friendly scene API, procedural 3D assets, reusable real-time effects and seeded world generation.
+GoodieGraphics.js is a high-level 3D graphics toolkit for the web, powered by Three.js. It provides a general-purpose geometry library, a custom model builder, 3D asset import, procedural examples, reusable real-time effects, animation tools and seeded world generation.
 
 > Early development: APIs may change while the project grows. The package is not published to npm yet.
 
